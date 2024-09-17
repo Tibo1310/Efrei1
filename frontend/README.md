@@ -22,3 +22,7 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+##
+To see all the items, go to : http://localhost:5000/items
+To add an item, go to : http://localhost:5000

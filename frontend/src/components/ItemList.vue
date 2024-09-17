@@ -1,6 +1,7 @@
 <template>
   <div class="container mt-5">
-    <h1 class="mb-4 text-center">Liste des Items</h1>
+    <h1 class="mb-4 text-center">Bienvenue sur mon site</h1>
+    <h2 class="mb-4 text-center">Liste des Items</h2>
     <ul class="list-group">
       <li v-for="item in items" :key="item._id" class="list-group-item">
         <strong>{{ item.name }}:</strong> {{ item.description }}
