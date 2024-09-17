@@ -19,7 +19,6 @@ const routes = [
     name: 'ItemList',
     component: ItemList
   }
-  // ... other routes ...
 ];
 
 const router = createRouter({
