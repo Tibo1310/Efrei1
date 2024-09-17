@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import AddItem from './components/AddItem.vue';
-import ItemList from './components/ItemList.vue';
+import AddItem from './AddItem.vue';
+import ItemList from './ItemList.vue';
 
 export default {
   data() {
