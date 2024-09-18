@@ -1,13 +1,10 @@
 <template>
-  <footer class="bg-light py-4 mt-4">
+  <footer class="footer bg-light py-3">
     <div class="container">
       <div class="row">
-        <div class="col-md-6 text-center text-md-start">
-          <p class="mb-0">&copy; {{ currentYear }} My App. All rights reserved.</p>
-        </div>
-        <div class="col-md-6 text-center text-md-end">
-          <router-link to="/privacypolicy" class="text-muted me-2">Privacy Policy</router-link>
-          <router-link to="/termsofservice" class="text-muted me-2">Terms of Service</router-link>
+        <div class="col-12 text-center">
+          <router-link to="/privacypolicy" class="text-muted me-3">Privacy Policy</router-link>
+          <router-link to="/termsofservice" class="text-muted me-3">Terms of Service</router-link>
           <router-link to="/contactus" class="text-muted">Contact Us</router-link>
         </div>
       </div>
@@ -27,8 +24,11 @@ export default {
 </script>
 
 <style scoped>
-footer {
+.footer {
+  height: 50px; /* Set a fixed height for the footer */
   box-shadow: 0 -2px 4px rgba(0,0,0,.05);
+  display: flex;
+  align-items: center;
 }
 
 footer a {

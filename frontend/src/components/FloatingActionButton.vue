@@ -15,7 +15,7 @@ export default {
 <style scoped>
 .floating-action-button-container {
   position: fixed;
-  bottom: 20px;
+  bottom: 70px;
   left: 0;
   right: 0;
   display: flex;
