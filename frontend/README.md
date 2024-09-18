@@ -24,5 +24,8 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ##
+Lancer front front VueJS: npm run serve
+To add an item, go to : http://localhost:8080
+
+Lancer serveur node: node server.js
 To see all the items, go to : http://localhost:5000/items
-To add an item, go to : http://localhost:5000
