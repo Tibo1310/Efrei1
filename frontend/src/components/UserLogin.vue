@@ -40,10 +40,12 @@ export default {
         if (response.ok) {
           const data = await response.json();
           localStorage.setItem('token', data.token);
-          localStorage.setItem('username', data.username); // Stocke le nom d'utilisateur
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('userId', data.userId);
+          localStorage.setItem('userIcon', data.icon);
           alert('Login successful');
           this.$router.push('/');
-          location.reload(); // Recharge la page pour mettre à jour l'en-tête
+          location.reload();
         } else {
           const data = await response.json();
           alert(data.message || 'Login failed');

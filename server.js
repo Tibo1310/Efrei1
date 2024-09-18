@@ -87,7 +87,12 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
         const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ token, username: user.username }); // Renvoie également le nom d'utilisateur
+        res.json({ 
+            token, 
+            username: user.username,
+            userId: user._id,
+            icon: user.icon
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -95,6 +100,7 @@ app.post('/login', async (req, res) => {
 
 // Update user icon
 app.put('/user/icon', async (req, res) => {
+    console.log('Received request to update user icon:', req.body);
     try {
         const { userId, icon } = req.body;
         const user = await User.findByIdAndUpdate(userId, { icon }, { new: true });
@@ -103,6 +109,7 @@ app.put('/user/icon', async (req, res) => {
         }
         res.json({ message: 'Icon updated successfully', icon: user.icon });
     } catch (error) {
+        console.error('Error updating user icon:', error);
         res.status(500).json({ message: error.message });
     }
 });

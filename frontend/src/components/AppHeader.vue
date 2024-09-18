@@ -54,7 +54,8 @@ export default {
       isLoggedIn: false,
       username: '',
       userIcon: 'fas fa-user-circle',
-      showIconSelector: false
+      showIconSelector: false,
+      userId: null // Ajout de l'ID de l'utilisateur
     }
   },
   created() {
@@ -65,26 +66,54 @@ export default {
       const token = localStorage.getItem('token');
       const username = localStorage.getItem('username');
       const userIcon = localStorage.getItem('userIcon') || 'fas fa-user-circle';
-      if (token && username) {
+      const userId = localStorage.getItem('userId');
+      if (token && username && userId) {
         this.isLoggedIn = true;
         this.username = username;
         this.userIcon = userIcon;
+        this.userId = userId;
       }
     },
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       localStorage.removeItem('userIcon');
+      localStorage.removeItem('userId');
       this.isLoggedIn = false;
       this.username = '';
       this.userIcon = 'fas fa-user-circle';
+      this.userId = null;
       this.$router.push('/login');
     },
-    selectIcon(icon) {
+    async selectIcon(icon) {
+      console.log('Updating icon for user:', this.userId);
       this.userIcon = icon;
       localStorage.setItem('userIcon', icon);
       this.showIconSelector = false;
-      // Here you would typically send an API request to update the user's icon in the database
+      
+      try {
+        const response = await fetch('http://localhost:5000/user/icon', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            userId: this.userId,
+            icon: icon
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update icon');
+        }
+        
+        const data = await response.json();
+        console.log(data.message);
+      } catch (error) {
+        console.error('Error updating icon:', error);
+        alert('Failed to update icon. Please try again.');
+      }
     }
   }
 };
