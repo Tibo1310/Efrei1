@@ -46,6 +46,22 @@ const verifyToken = (req, res, next) => {
     });
 };
 
+// Vérifier le serveur
+app.get('/', (req, res) => {
+    res.send('API running');
+});
+
+// Récupérer tous les items (GET)
+app.get('/items', async (req, res) => {
+    try {
+        const items = await Item.find();
+        res.json(items);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 // Create a new post (using the Item model)
 app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
     try {
