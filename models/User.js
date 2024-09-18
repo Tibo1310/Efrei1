@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  icon: {
+    type: String,
+    default: 'fas fa-user-circle'
+  },
   createdAt: {
     type: Date,
     default: Date.now

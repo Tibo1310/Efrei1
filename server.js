@@ -93,6 +93,20 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Update user icon
+app.put('/user/icon', async (req, res) => {
+    try {
+        const { userId, icon } = req.body;
+        const user = await User.findByIdAndUpdate(userId, { icon }, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ message: 'Icon updated successfully', icon: user.icon });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 ///////////////////////////////////////
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;
