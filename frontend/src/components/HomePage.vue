@@ -7,7 +7,7 @@
     <div v-else class="row">
       <div v-for="post in posts" :key="post._id" class="col-md-4 mb-4">
         <div class="card">
-          <img v-if="post.mediaUrl" :src="post.mediaUrl" class="card-img-top" alt="Post media">
+          <img v-if="post.mediaUrl" :src="`http://localhost:5000${post.mediaUrl}`" class="card-img-top" alt="Post media">
           <div class="card-body">
             <h5 class="card-title">{{ post.title }}</h5>
             <p class="card-text">{{ post.description }}</p>
@@ -17,7 +17,7 @@
       </div>
     </div>
     <FloatingActionButton v-if="isLoggedIn" @click="showModal = true" />
-    <CreatePostModal v-if="showModal" @close="showModal = false" @post-created="fetchPosts" />
+    <CreatePostModal v-if="showModal" @close="showModal = false" @post-created="handlePostCreated" />
   </div>
 </template>
 
@@ -57,6 +57,10 @@ export default {
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
+    },
+    handlePostCreated() {
+      this.showModal = false;
+      this.fetchPosts();
     }
   }
 }
