@@ -22,101 +22,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.log(err));
 
-// Vérifier le serveur
-app.get('/', (req, res) => {
-    res.send('API running');
-});
-
-// Récupérer tous les items (GET)
-app.get('/items', async (req, res) => {
-    try {
-        const items = await Item.find();
-        res.json(items);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Ajouter un nouvel item (POST)
-app.post('/items', async (req, res) => {
-    const item = new Item({
-        name: req.body.name,
-        description: req.body.description
-    });
-
-    try {
-        const newItem = await item.save();
-        res.status(201).json(newItem);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Récupérer un item par son ID (GET)
-app.get('/items/:id', async (req, res) => {
-    try {
-        const item = await Item.findById(req.params.id);
-        if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-        res.json(item);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Register route
-app.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const user = new User({ username, email, password });
-        await user.save();
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
-// Login route
-app.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-        const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ 
-            token, 
-            username: user.username,
-            userId: user._id,
-            icon: user.icon
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-// Update user icon
-app.put('/user/icon', async (req, res) => {
-    console.log('Received request to update user icon:', req.body);
-    try {
-        const { userId, icon } = req.body;
-        const user = await User.findByIdAndUpdate(userId, { icon }, { new: true });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json({ message: 'Icon updated successfully', icon: user.icon });
-    } catch (error) {
-        console.error('Error updating user icon:', error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -128,17 +33,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-// Create a new Post model
-const PostSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    mediaUrl: String,
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Post = mongoose.model('Post', PostSchema);
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -152,19 +46,21 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-// Create a new post
+// Create a new post (using the Item model)
 app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
     try {
         const { title, description } = req.body;
-        const post = new Post({
-            title,
-            description,
+        const post = new Item({
+            name: title,
+            description: description,
             author: req.userId,
-            mediaUrl: req.file ? `/uploads/${req.file.filename}` : null
+            mediaUrl: req.file ? `/uploads/${req.file.filename}` : null,
+            type: 'post'
         });
         await post.save();
         res.status(201).json(post);
     } catch (error) {
+        console.error('Error creating post:', error);
         res.status(400).json({ message: error.message });
     }
 });
@@ -172,7 +68,7 @@ app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
 // Get all posts
 app.get('/posts', async (req, res) => {
     try {
-        const posts = await Post.find().populate('author', 'username').sort('-createdAt');
+        const posts = await Item.find({ type: 'post' }).populate('author', 'username').sort('-dateCreated');
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
