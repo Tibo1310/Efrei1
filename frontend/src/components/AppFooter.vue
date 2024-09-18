@@ -6,9 +6,9 @@
           <p class="mb-0">&copy; {{ currentYear }} My App. All rights reserved.</p>
         </div>
         <div class="col-md-6 text-center text-md-end">
-          <a href="#" class="text-muted me-2">Privacy Policy</a>
-          <a href="#" class="text-muted me-2">Terms of Service</a>
-          <a href="#" class="text-muted">Contact Us</a>
+          <router-link to="/privacypolicy" class="text-muted me-2">Privacy Policy</router-link>
+          <router-link to="/termsofservice" class="text-muted me-2">Terms of Service</router-link>
+          <router-link to="/contactus" class="text-muted">Contact Us</router-link>
         </div>
       </div>
     </div>

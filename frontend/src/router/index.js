@@ -4,6 +4,9 @@ import ItemList from '../components/ItemList.vue';
 import HomePage from '../components/HomePage.vue';
 import UserRegister from '../components/UserRegister.vue';
 import UserLogin from '../components/UserLogin.vue';
+import PrivacyPolicy from '../components/PrivacyPolicy.vue';
+import TermsOfService from '../components/TermsOfService.vue';
+import ContactUs from '../components/ContactUs.vue';
 
 const routes = [
   {
@@ -30,6 +33,21 @@ const routes = [
     path: '/login',
     name: 'UserLogin',
     component: UserLogin
+  },
+  {
+    path: '/privacypolicy',
+    name: 'PrivacyPolicy',
+    component: PrivacyPolicy
+  },
+  {
+    path: '/termsofservice',
+    name: 'TermsOfService',
+    component: TermsOfService
+  },
+  {
+    path: '/contactus',
+    name: 'ContactUs',
+    component: ContactUs
   }
 ];
 
