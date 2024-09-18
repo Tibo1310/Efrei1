@@ -22,13 +22,8 @@ export default {
 };
 </script>
 
-<style scoped>
-.navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.8);
-  transition: color 0.3s ease;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #ffffff;
+<style>
+#app {
+  font-family: 'Arial', sans-serif;
 }
 </style>
