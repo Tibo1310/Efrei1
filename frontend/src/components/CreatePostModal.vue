@@ -9,19 +9,25 @@
       </div>
       <div class="modal-body">
         <form @submit.prevent="submitPost">
-          <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" v-model="title" required>
+          <div class="form-group mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" v-model="title" required placeholder="Enter post title">
           </div>
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" v-model="description" rows="3" required></textarea>
+          <div class="form-group mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" v-model="description" rows="4" required placeholder="Write your post content here"></textarea>
           </div>
-          <div class="form-group">
-            <label for="media">Image (optional)</label>
-            <input type="file" class="form-control-file" id="media" @change="handleFileUpload" accept="image/*">
+          <div class="form-group mb-3">
+            <label for="media" class="form-label">Image (optional)</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="media" @change="handleFileUpload" accept="image/*">
+              <label class="custom-file-label" for="media">{{ mediaLabel }}</label>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary mt-3">Publish</button>
+          <div v-if="previewUrl" class="mb-3">
+            <img :src="previewUrl" alt="Preview" class="img-preview">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Publish</button>
         </form>
       </div>
     </div>
@@ -35,12 +41,24 @@ export default {
     return {
       title: '',
       description: '',
-      media: null
+      media: null,
+      mediaLabel: 'Choose an image',
+      previewUrl: null
     }
   },
   methods: {
     handleFileUpload(event) {
-      this.media = event.target.files[0];
+      const file = event.target.files[0];
+      this.media = file;
+      this.mediaLabel = file ? file.name : 'Choose an image';
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => this.previewUrl = e.target.result;
+        reader.readAsDataURL(file);
+      } else {
+        this.previewUrl = null;
+      }
     },
     async submitPost() {
       const formData = new FormData();
@@ -95,6 +113,8 @@ export default {
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .close {
@@ -102,5 +122,54 @@ export default {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.custom-file {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  margin-bottom: 0;
+}
+
+.custom-file-input {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  margin: 0;
+  opacity: 0;
+}
+
+.custom-file-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.img-preview {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+@media (max-width: 576px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
 }
 </style>
