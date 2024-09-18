@@ -13,12 +13,22 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/list">Item List</router-link>
           </li>
-          <li class="nav-item d-lg-none">
-            <router-link class="nav-link" to="/register">Register</router-link>
-          </li>
-          <li class="nav-item d-lg-none">
-            <router-link class="nav-link" to="/login">Login</router-link>
-          </li>
+          <template v-if="!isLoggedIn">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/register">Register</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/login">Login</router-link>
+            </li>
+          </template>
+          <template v-else>
+            <li class="nav-item">
+              <span class="nav-link">Welcome, {{ username }}</span>
+            </li>
+            <li class="nav-item">
+              <a @click.prevent="logout" class="nav-link" href="#">Logout</a>
+            </li>
+          </template>
         </ul>
       </div>
     </div>
@@ -27,7 +37,33 @@
 
 <script>
 export default {
-  name: 'AppHeader'
+  name: 'AppHeader',
+  data() {
+    return {
+      isLoggedIn: false,
+      username: ''
+    }
+  },
+  created() {
+    this.checkLoginStatus();
+  },
+  methods: {
+    checkLoginStatus() {
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+      if (token && username) {
+        this.isLoggedIn = true;
+        this.username = username;
+      }
+    },
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      this.isLoggedIn = false;
+      this.username = '';
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -35,6 +71,7 @@ export default {
 .navbar-nav .nav-link {
   color: rgba(255, 255, 255, 0.8);
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .navbar-nav .nav-link:hover {
