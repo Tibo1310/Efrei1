@@ -60,11 +60,14 @@ export default {
       username: '',
       userIcon: 'fas fa-user-circle',
       showIconSelector: false,
-      userId: null // Ajout de l'ID de l'utilisateur
+      userId: null
     }
   },
   created() {
     this.checkLoginStatus();
+    this.$router.afterEach(() => {
+      this.checkLoginStatus();
+    });
   },
   methods: {
     checkLoginStatus() {
@@ -77,6 +80,11 @@ export default {
         this.username = username;
         this.userIcon = userIcon;
         this.userId = userId;
+      } else {
+        this.isLoggedIn = false;
+        this.username = '';
+        this.userIcon = 'fas fa-user-circle';
+        this.userId = null;
       }
     },
     logout() {

@@ -43,9 +43,7 @@ export default {
           localStorage.setItem('username', data.username);
           localStorage.setItem('userId', data.userId);
           localStorage.setItem('userIcon', data.icon);
-          alert('Login successful');
           this.$router.push('/');
-          location.reload();
         } else {
           const data = await response.json();
           alert(data.message || 'Login failed');

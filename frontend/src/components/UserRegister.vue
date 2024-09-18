@@ -32,7 +32,7 @@ export default {
   methods: {
     async register() {
       try {
-        const response = await fetch('http://localhost:5000/register', {
+        const registerResponse = await fetch('http://localhost:5000/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -43,11 +43,30 @@ export default {
             password: this.password
           })
         });
-        if (response.ok) {
-          alert('Registration successful');
-          this.$router.push('/login');
+        if (registerResponse.ok) {
+          const loginResponse = await fetch('http://localhost:5000/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: this.email,
+              password: this.password
+            })
+          });
+          if (loginResponse.ok) {
+            const data = await loginResponse.json();
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userIcon', data.icon);
+            this.$root.$emit('login'); // Émettre un événement personnalisé
+            this.$router.push('/');
+          } else {
+            throw new Error('Auto-login failed after registration');
+          }
         } else {
-          const data = await response.json();
+          const data = await registerResponse.json();
           alert(data.message || 'Registration failed');
         }
       } catch (error) {
