@@ -39,6 +39,6 @@ export default {
 }
 
 main {
-  padding-bottom: 60px; /* Add padding to the bottom of the main content to account for the footer height */
+  padding-bottom: 70px; /* Increased padding to account for the fixed footer */
 }
 </style>

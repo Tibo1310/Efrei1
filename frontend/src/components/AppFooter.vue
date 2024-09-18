@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer bg-light py-3">
+  <footer class="footer bg-light">
     <div class="container">
       <div class="row">
         <div class="col-12 text-center">
@@ -25,10 +25,16 @@ export default {
 
 <style scoped>
 .footer {
-  height: 50px; /* Set a fixed height for the footer */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
   box-shadow: 0 -2px 4px rgba(0,0,0,.05);
   display: flex;
   align-items: center;
+  background-color: #f8f9fa;
+  z-index: 1000;
 }
 
 footer a {
