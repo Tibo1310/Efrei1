@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import { eventBus } from '../eventBus';
+
 export default {
   name: 'UserLogin',
   data() {
@@ -43,6 +45,7 @@ export default {
           localStorage.setItem('username', data.username);
           localStorage.setItem('userId', data.userId);
           localStorage.setItem('userIcon', data.icon);
+          eventBus.emit('login'); // Ajouter cette ligne
           this.$router.push('/');
         } else {
           const data = await response.json();

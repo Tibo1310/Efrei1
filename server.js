@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+
 const app = express();
 require('dotenv').config();
 
@@ -113,6 +116,71 @@ app.put('/user/icon', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Create a new Post model
+const PostSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    mediaUrl: String,
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Post = mongoose.model('Post', PostSchema);
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) return res.status(403).json({ message: 'No token provided' });
+
+    jwt.verify(token, 'your_jwt_secret', (err, decoded) => {
+        if (err) return res.status(401).json({ message: 'Failed to authenticate token' });
+        req.userId = decoded.userId;
+        next();
+    });
+};
+
+// Create a new post
+app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
+    try {
+        const { title, description } = req.body;
+        const post = new Post({
+            title,
+            description,
+            author: req.userId,
+            mediaUrl: req.file ? `/uploads/${req.file.filename}` : null
+        });
+        await post.save();
+        res.status(201).json(post);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// Get all posts
+app.get('/posts', async (req, res) => {
+    try {
+        const posts = await Post.find().populate('author', 'username').sort('-createdAt');
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
 
 ///////////////////////////////////////
 // Démarrer le serveur

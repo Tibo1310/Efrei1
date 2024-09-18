@@ -13,6 +13,7 @@
 <script>
 import AppHeader from './AppHeader.vue';
 import AppFooter from './AppFooter.vue';
+import { eventBus } from '../eventBus';
 
 export default {
   components: {
@@ -20,11 +21,14 @@ export default {
     AppFooter
   },
   mounted() {
-    this.$root.$on('login', () => {
+    eventBus.on('login', () => {
       if (this.$refs.header) {
         this.$refs.header.checkLoginStatus();
       }
     });
+  },
+  beforeUnmount() {
+    eventBus.off('login');
   }
 };
 </script>

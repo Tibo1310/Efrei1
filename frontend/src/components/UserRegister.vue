@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { eventBus } from '../eventBus';
+
 export default {
   name: 'UserRegister',
   data() {
@@ -60,7 +62,7 @@ export default {
             localStorage.setItem('username', data.username);
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('userIcon', data.icon);
-            this.$root.$emit('login'); // Émettre un événement personnalisé
+            eventBus.emit('login'); // Utiliser le bus d'événements ici
             this.$router.push('/');
           } else {
             throw new Error('Auto-login failed after registration');
