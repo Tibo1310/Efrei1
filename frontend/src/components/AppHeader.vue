@@ -112,13 +112,13 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           body: JSON.stringify({
-            userId: this.userId,
             icon: icon
           })
         });
         
         if (!response.ok) {
-          throw new Error('Failed to update icon');
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update icon');
         }
         
         const data = await response.json();
@@ -126,6 +126,7 @@ export default {
       } catch (error) {
         console.error('Error updating icon:', error);
         alert('Failed to update icon. Please try again.');
+        this.userIcon = localStorage.getItem('userIcon') || 'fas fa-user-circle';
       }
     }
   }

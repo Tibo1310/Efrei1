@@ -45,6 +45,7 @@ export default {
             password: this.password
           })
         });
+        const data = await registerResponse.json();
         if (registerResponse.ok) {
           const loginResponse = await fetch('http://localhost:5000/login', {
             method: 'POST',
@@ -68,7 +69,6 @@ export default {
             throw new Error('Auto-login failed after registration');
           }
         } else {
-          const data = await registerResponse.json();
           alert(data.message || 'Registration failed');
         }
       } catch (error) {

@@ -25,7 +25,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ##
 Lancer front front VueJS: npm run serve
-To add an item, go to : http://localhost:8080
+Pour aller sur le site (front) : http://localhost:8080
 
 Lancer serveur node: node server.js
-To see all the items, go to : http://localhost:5000/items
+Pour voir tous les items : http://localhost:5000/items
