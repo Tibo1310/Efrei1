@@ -163,7 +163,11 @@ app.post('/login', async (req, res) => {
 app.put('/user/icon', verifyToken, upload.single('icon'), async (req, res) => {
     try {
         const userId = req.userId; // This comes from the verifyToken middleware
-        const iconUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        let iconUrl = req.body.icon;
+
+        if (req.file) {
+            iconUrl = `/uploads/${req.file.filename}`;
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,

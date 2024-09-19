@@ -8,12 +8,6 @@
         </button>
       </div>
       <div class="icon-selector-body">
-        <h6>Basic icons</h6>
-        <div class="icon-grid">
-          <div v-for="icon in basicIcons" :key="icon" class="icon-item" @click="selectIcon(icon)">
-            <i :class="icon"></i>
-          </div>
-        </div>
         <h6>Custom icon</h6>
         <div class="custom-icon-upload" @dragover.prevent @drop.prevent="handleDrop">
           <input type="file" @change="handleFileUpload" ref="fileInput" style="display: none;">
@@ -35,25 +29,11 @@ export default {
   name: 'IconSelector',
   data() {
     return {
-      basicIcons: [
-        'fas fa-user-circle',
-        'fas fa-user',
-        'fas fa-user-alt',
-        'fas fa-user-tie',
-        'fas fa-user-ninja',
-        'fas fa-user-astronaut',
-        'fas fa-user-md',
-        'fas fa-user-secret',
-        'fas fa-user-graduate'
-      ],
       customIcon: null,
       previewUrl: null
     };
   },
   methods: {
-    selectIcon(icon) {
-      this.$emit('select-icon', icon);
-    },
     handleFileUpload(event) {
       const file = event.target.files[0];
       this.customIcon = file;
@@ -110,29 +90,6 @@ export default {
 
 .icon-selector-title {
   margin: 0;
-}
-
-.icon-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.icon-item {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.icon-item:hover {
-  background-color: #f0f0f0;
 }
 
 .custom-icon-upload {

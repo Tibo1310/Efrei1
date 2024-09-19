@@ -28,7 +28,7 @@ export default createStore({
       localStorage.setItem('token', user.token)
       localStorage.setItem('username', user.username)
       localStorage.setItem('userId', user.userId)
-      localStorage.setItem('userIcon', user.icon)
+      localStorage.setItem('userIcon', user.icon || 'fas fa-user-circle')
       commit('setLoginStatus', true)
     },
     logout({ commit }) {
@@ -51,7 +51,7 @@ export default createStore({
       const token = localStorage.getItem('token')
       const username = localStorage.getItem('username')
       const userId = localStorage.getItem('userId')
-      const icon = localStorage.getItem('userIcon')
+      const icon = localStorage.getItem('userIcon') || 'fas fa-user-circle'
       if (token && username && userId) {
         commit('setUser', { token, username, userId, icon })
         commit('setLoginStatus', true)
@@ -115,10 +115,10 @@ export default createStore({
         console.error('Error fetching items:', error);
       }
     },
-    async updateUserIcon({ commit, state }, iconFile) {
+    async updateUserIcon({ commit, state }, icon) {
       try {
         const formData = new FormData();
-        formData.append('icon', iconFile);
+        formData.append('icon', icon);
 
         const response = await fetch('http://localhost:5000/user/icon', {
           method: 'PUT',
@@ -145,6 +145,6 @@ export default createStore({
   getters: {
     isLoggedIn: state => state.isLoggedIn,
     username: state => state.user ? state.user.username : '',
-    userIcon: state => state.user ? state.user.icon : 'fas fa-user-circle'
+    userIcon: state => state.user && state.user.icon ? state.user.icon : 'fas fa-user-circle'
   }
 })

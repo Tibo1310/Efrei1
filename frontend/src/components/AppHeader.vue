@@ -11,7 +11,7 @@
         <div v-if="isLoggedIn" class="d-flex align-items-center me-3">
           <span class="text-light me-2">{{ username }}</span>
           <div class="user-icon" @click="showIconSelector = true">
-            <img v-if="userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" />
+            <img v-if="userIcon && userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" />
             <i v-else :class="userIcon"></i>
           </div>
         </div>
