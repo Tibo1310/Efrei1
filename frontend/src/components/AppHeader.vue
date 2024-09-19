@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import IconSelector from './IconSelector.vue';
 
 export default {
@@ -62,6 +63,9 @@ export default {
       showIconSelector: false,
       userId: null
     }
+  },
+  computed: {
+    ...mapGetters(['isLoggedIn', 'username'])
   },
   created() {
     this.checkLoginStatus();
@@ -88,6 +92,7 @@ export default {
       }
     },
     logout() {
+      this.$store.dispatch('logout');
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       localStorage.removeItem('userIcon');
