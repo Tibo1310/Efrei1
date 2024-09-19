@@ -20,6 +20,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: 'fas fa-user-circle'
   },
+  nationality: {
+    type: String,
+    required: true
+  },
+  knownLanguages: [{
+    language: String,
+    level: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'advanced', 'fluent']
+    }
+  }],
+  learningLanguages: [String],
   createdAt: {
     type: Date,
     default: Date.now
