@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
     <h2 class="mb-4 text-center">Login</h2>
-    <form @submit.prevent="login" class="border p-4 rounded shadow-sm bg-light">
+    <form @submit.prevent="handleLogin" class="border p-4 rounded shadow-sm bg-light">
       <div class="mb-3">
         <label for="email" class="form-label">Email:</label>
         <input type="email" id="email" v-model="email" class="form-control" required>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { eventBus } from '../eventBus';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'UserLogin',
@@ -27,7 +27,8 @@ export default {
     };
   },
   methods: {
-    async login() {
+    ...mapActions(['login']),
+    async handleLogin() {
       try {
         const response = await fetch('http://localhost:5000/login', {
           method: 'POST',
@@ -41,11 +42,7 @@ export default {
         });
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('username', data.username);
-          localStorage.setItem('userId', data.userId);
-          localStorage.setItem('userIcon', data.icon);
-          eventBus.emit('login'); // Ajouter cette ligne
+          await this.login(data); // Use the Vuex action to login
           this.$router.push('/');
         } else {
           const data = await response.json();

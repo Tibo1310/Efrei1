@@ -110,12 +110,6 @@ app.post('/register', async (req, res) => {
     try {
         const { username, email, password, nationality, knownLanguages, learningLanguages } = req.body;
         
-        // Check if user already exists
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User with this email or username already exists' });
-        }
-
         const user = new User({ 
             username, 
             email, 
@@ -125,7 +119,17 @@ app.post('/register', async (req, res) => {
             learningLanguages 
         });
         await user.save();
-        res.status(201).json({ message: 'User registered successfully' });
+
+        // Generate token for the new user
+        const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+
+        res.status(201).json({ 
+            message: 'User registered successfully',
+            token,
+            username: user.username,
+            userId: user._id,
+            icon: user.icon
+        });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(400).json({ message: error.message });

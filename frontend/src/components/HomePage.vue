@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 import FloatingActionButton from './FloatingActionButton.vue';
 import CreatePostModal from './CreatePostModal.vue';
 
@@ -36,31 +37,17 @@ export default {
   },
   data() {
     return {
-      posts: [],
-      showModal: false,
-      isLoggedIn: false
+      showModal: false
     }
   },
+  computed: {
+    ...mapState(['posts', 'isLoggedIn'])
+  },
   created() {
-    this.checkLoginStatus();
     this.fetchPosts();
   },
   methods: {
-    checkLoginStatus() {
-      this.isLoggedIn = !!localStorage.getItem('token');
-    },
-    async fetchPosts() {
-      try {
-        const response = await fetch('http://localhost:5000/posts');
-        if (response.ok) {
-          this.posts = await response.json();
-        } else {
-          console.error('Failed to fetch posts');
-        }
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    },
+    ...mapActions(['fetchPosts']),
     handlePostCreated() {
       this.showModal = false;
       this.fetchPosts();

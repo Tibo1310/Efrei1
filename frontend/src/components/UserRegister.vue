@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
     <h2 class="mb-4 text-center">Register</h2>
-    <form @submit.prevent="register" class="border p-4 rounded shadow-sm bg-light">
+    <form @submit.prevent="handleRegister" class="border p-4 rounded shadow-sm bg-light">
       <!-- Existing fields -->
       <div class="mb-3">
         <label for="username" class="form-label">Username:</label>
@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { eventBus } from '../eventBus';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'UserRegister',
@@ -96,64 +96,21 @@ export default {
     };
   },
   methods: {
-    addKnownLanguage() {
-      this.knownLanguages.push({ language: '', level: 'beginner' });
-    },
-    removeKnownLanguage(index) {
-      this.knownLanguages.splice(index, 1);
-    },
-    addLearningLanguage() {
-      this.learningLanguages.push('');
-    },
-    removeLearningLanguage(index) {
-      this.learningLanguages.splice(index, 1);
-    },
-    async register() {
-      try {
-        const registerResponse = await fetch('http://localhost:5000/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: this.username,
-            email: this.email,
-            password: this.password,
-            nationality: this.nationality,
-            knownLanguages: this.knownLanguages.filter(lang => lang.language !== ''),
-            learningLanguages: this.learningLanguages.filter(lang => lang !== '')
-          })
-        });
-        const data = await registerResponse.json();
-        if (registerResponse.ok) {
-          // Connexion automatique après l'inscription
-          const loginResponse = await fetch('http://localhost:5000/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email: this.email,
-              password: this.password
-            })
-          });
-          if (loginResponse.ok) {
-            const loginData = await loginResponse.json();
-            localStorage.setItem('token', loginData.token);
-            localStorage.setItem('username', loginData.username);
-            localStorage.setItem('userId', loginData.userId);
-            localStorage.setItem('userIcon', loginData.icon);
-            eventBus.emit('login');
-            this.$router.push('/');
-          } else {
-            throw new Error('Auto-login failed after registration');
-          }
-        } else {
-          alert(data.message || 'Registration failed');
-        }
-      } catch (error) {
-        console.error('Error during registration:', error);
-        alert('An error occurred during registration');
+    ...mapActions(['register']),
+    async handleRegister() {
+      const result = await this.register({
+        username: this.username,
+        email: this.email,
+        password: this.password,
+        nationality: this.nationality,
+        knownLanguages: this.knownLanguages.filter(lang => lang.language !== ''),
+        learningLanguages: this.learningLanguages.filter(lang => lang !== '')
+      });
+      if (result.success) {
+        // The user is now automatically logged in, so we can redirect to the home page
+        this.$router.push('/');
+      } else {
+        alert(result.message);
       }
     }
   }

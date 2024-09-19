@@ -10,25 +10,17 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
-  data() {
-    return {
-      items: []
-    };
+  computed: {
+    ...mapState(['items'])
   },
   created() {
     this.fetchItems();
   },
   methods: {
-    async fetchItems() {
-      try {
-        const response = await fetch('http://localhost:5000/items');
-        const data = await response.json();
-        this.items = data;
-      } catch (error) {
-        console.error('Erreur lors de la récupération des items :', error);
-      }
-    }
+    ...mapActions(['fetchItems'])
   }
 };
 </script>

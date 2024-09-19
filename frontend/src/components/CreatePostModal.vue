@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: 'CreatePostModal',
   data() {
@@ -47,6 +49,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['createPost']),
     handleFileUpload(event) {
       const file = event.target.files[0];
       this.media = file;
@@ -68,25 +71,12 @@ export default {
         formData.append('media', this.media);
       }
 
-      try {
-        const response = await fetch('http://localhost:5000/posts', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: formData
-        });
-
-        if (response.ok) {
-          this.$emit('post-created');
-          this.$emit('close');
-        } else {
-          const error = await response.json();
-          alert(error.message || 'Failed to create post');
-        }
-      } catch (error) {
-        console.error('Error creating post:', error);
-        alert('An error occurred while creating the post');
+      const result = await this.createPost(formData);
+      if (result.success) {
+        this.$emit('post-created');
+        this.$emit('close');
+      } else {
+        alert(result.message);
       }
     }
   }

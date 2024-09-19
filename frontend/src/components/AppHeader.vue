@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import IconSelector from './IconSelector.vue';
 
 export default {
@@ -57,81 +57,28 @@ export default {
   },
   data() {
     return {
-      isLoggedIn: false,
-      username: '',
-      userIcon: 'fas fa-user-circle',
-      showIconSelector: false,
-      userId: null
+      showIconSelector: false
     }
   },
   computed: {
-    ...mapGetters(['isLoggedIn', 'username'])
+    ...mapGetters(['isLoggedIn', 'username', 'userIcon'])
   },
   created() {
     this.checkLoginStatus();
-    this.$router.afterEach(() => {
-      this.checkLoginStatus();
-    });
   },
   methods: {
-    checkLoginStatus() {
-      const token = localStorage.getItem('token');
-      const username = localStorage.getItem('username');
-      const userIcon = localStorage.getItem('userIcon') || 'fas fa-user-circle';
-      const userId = localStorage.getItem('userId');
-      if (token && username && userId) {
-        this.isLoggedIn = true;
-        this.username = username;
-        this.userIcon = userIcon;
-        this.userId = userId;
-      } else {
-        this.isLoggedIn = false;
-        this.username = '';
-        this.userIcon = 'fas fa-user-circle';
-        this.userId = null;
-      }
-    },
-    logout() {
-      this.$store.dispatch('logout');
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userIcon');
-      localStorage.removeItem('userId');
-      this.isLoggedIn = false;
-      this.username = '';
-      this.userIcon = 'fas fa-user-circle';
-      this.userId = null;
+    ...mapActions(['logout', 'checkLoginStatus', 'updateUserIcon']),
+    handleLogout() {
+      this.logout();
       this.$router.push('/login');
     },
     async selectIcon(icon) {
-      console.log('Updating icon for user:', this.userId);
-      this.userIcon = icon;
-      localStorage.setItem('userIcon', icon);
-      this.showIconSelector = false;
-      
       try {
-        const response = await fetch('http://localhost:5000/user/icon', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            icon: icon
-          })
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to update icon');
-        }
-        
-        const data = await response.json();
-        console.log(data.message);
+        await this.updateUserIcon(icon);
+        this.showIconSelector = false;
       } catch (error) {
         console.error('Error updating icon:', error);
         alert('Failed to update icon. Please try again.');
-        this.userIcon = localStorage.getItem('userIcon') || 'fas fa-user-circle';
       }
     }
   }
