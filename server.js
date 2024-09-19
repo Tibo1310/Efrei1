@@ -79,7 +79,9 @@ app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
             description: description,
             author: req.userId,
             mediaUrl: req.file ? `/uploads/${req.file.filename}` : null,
-            type: 'post'
+            type: 'post',
+            comments: [], // Initialize comments as an empty array
+            likes: [] // Initialize likes as an empty array
         });
         await post.save();
         res.status(201).json(post);
@@ -92,7 +94,7 @@ app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
 // Get all posts
 app.get('/posts', async (req, res) => {
     try {
-        const posts = await Item.find({ type: 'post' }).populate('author', 'username').sort('-dateCreated');
+        const posts = await Item.find({ type: 'post' }).populate('author', 'username icon followers').sort('-dateCreated');
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });

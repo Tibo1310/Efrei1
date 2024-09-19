@@ -39,7 +39,6 @@ export default createStore({
       localStorage.removeItem('userIcon')
     },
     fetchPosts({ commit }) {
-      // Ici, vous feriez un appel API réel pour récupérer les posts
       fetch('http://localhost:5000/posts')
         .then(response => response.json())
         .then(data => {
@@ -69,7 +68,6 @@ export default createStore({
         });
         if (response.ok) {
           const data = await response.json();
-          // After successful registration, automatically log in the user
           await dispatch('login', data);
           return { success: true };
         } else {
@@ -88,7 +86,7 @@ export default createStore({
           headers: {
             'Authorization': `Bearer ${state.user.token}`
           },
-          body: postData // Now we're sending FormData directly
+          body: postData
         });
         if (response.ok) {
           await dispatch('fetchPosts');
