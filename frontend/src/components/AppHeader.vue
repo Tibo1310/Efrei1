@@ -37,6 +37,9 @@
           </template>
           <template v-else>
             <li class="nav-item">
+              <router-link class="nav-link" to="/profile">Modifier mon profil</router-link>
+            </li>
+            <li class="nav-item">
               <a @click.prevent="logout" class="nav-link" href="#">Logout</a>
             </li>
           </template>

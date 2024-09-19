@@ -7,6 +7,7 @@ import UserLogin from '../components/UserLogin.vue';
 import PrivacyPolicy from '../components/PrivacyPolicy.vue';
 import TermsOfService from '../components/TermsOfService.vue';
 import ContactUs from '../components/ContactUs.vue';
+import UserProfile from '../components/UserProfile.vue'; // Import the UserProfile component
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: '/contactus',
     name: 'ContactUs',
     component: ContactUs
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile // Add the route for the profile page
   }
 ];
 
