@@ -9,7 +9,7 @@
         <div class="card h-100 shadow-sm">
           <div class="card-header d-flex align-items-center">
             <img v-if="post.author && post.author.icon && post.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${post.author.icon}`" class="user-icon me-2" />
-            <i v-else :class="post.author ? post.author.icon : 'fas fa-user-circle'" class="user-icon me-2"></i>
+            <i v-else :class="[post.author ? post.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
             <div>
               <div class="username">{{ post.author ? post.author.username : 'Unknown' }}</div>
               <div class="followers">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
@@ -97,6 +97,11 @@ export default {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.basic-icon {
+  font-size: 40px; /* Adjust the size to match the custom icons */
+  line-height: 40px; /* Center the icon vertically */
 }
 
 .username {
