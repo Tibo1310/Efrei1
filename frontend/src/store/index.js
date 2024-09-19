@@ -115,15 +115,17 @@ export default createStore({
         console.error('Error fetching items:', error);
       }
     },
-    async updateUserIcon({ commit, state }, icon) {
+    async updateUserIcon({ commit, state }, iconFile) {
       try {
+        const formData = new FormData();
+        formData.append('icon', iconFile);
+
         const response = await fetch('http://localhost:5000/user/icon', {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${state.user.token}`
           },
-          body: JSON.stringify({ icon })
+          body: formData
         });
         
         if (!response.ok) {
@@ -131,8 +133,8 @@ export default createStore({
         }
         
         const data = await response.json();
-        commit('setUser', { ...state.user, icon });
-        localStorage.setItem('userIcon', icon);
+        commit('setUser', { ...state.user, icon: data.icon });
+        localStorage.setItem('userIcon', data.icon);
         return data;
       } catch (error) {
         console.error('Error updating icon:', error);

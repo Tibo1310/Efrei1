@@ -17,7 +17,9 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
+// Augmenter la limite de taille de charge utile
+app.use(express.json({ limit: '20mb' })); // Augmenter la limite à 20MB
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -36,7 +38,10 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 20 * 1024 * 1024 } // Augmenter la limite de taille de fichier à 20MB
+});
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -64,7 +69,6 @@ app.get('/items', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 
 // Create a new post (using the Item model)
 app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
@@ -156,14 +160,14 @@ app.post('/login', async (req, res) => {
 });
 
 // Update user icon
-app.put('/user/icon', verifyToken, async (req, res) => {
+app.put('/user/icon', verifyToken, upload.single('icon'), async (req, res) => {
     try {
-        const { icon } = req.body;
         const userId = req.userId; // This comes from the verifyToken middleware
+        const iconUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { icon: icon },
+            { icon: iconUrl },
             { new: true }
         );
 

@@ -11,7 +11,8 @@
         <div v-if="isLoggedIn" class="d-flex align-items-center me-3">
           <span class="text-light me-2">{{ username }}</span>
           <div class="user-icon" @click="showIconSelector = true">
-            <i :class="userIcon"></i>
+            <img v-if="userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" />
+            <i v-else :class="userIcon"></i>
           </div>
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,5 +138,12 @@ export default {
 
 .user-icon i {
   color: #007bff;
+}
+
+.custom-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>

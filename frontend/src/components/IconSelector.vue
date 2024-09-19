@@ -1,11 +1,30 @@
 <template>
-  <div class="icon-selector-overlay" @click="$emit('close')">
+  <div class="icon-selector-backdrop" @click="$emit('close')">
     <div class="icon-selector-content" @click.stop>
-      <h3>Select an Icon</h3>
-      <div class="icon-grid">
-        <div v-for="icon in icons" :key="icon" class="icon-item" @click="selectIcon(icon)">
-          <i :class="icon"></i>
+      <div class="icon-selector-header">
+        <h5 class="icon-selector-title">Select an icon</h5>
+        <button type="button" class="close" @click="$emit('close')" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="icon-selector-body">
+        <h6>Basic icons</h6>
+        <div class="icon-grid">
+          <div v-for="icon in basicIcons" :key="icon" class="icon-item" @click="selectIcon(icon)">
+            <i :class="icon"></i>
+          </div>
         </div>
+        <h6>Custom icon</h6>
+        <div class="custom-icon-upload" @dragover.prevent @drop.prevent="handleDrop">
+          <input type="file" @change="handleFileUpload" ref="fileInput" style="display: none;">
+          <div v-if="previewUrl" class="custom-icon-preview">
+            <img :src="previewUrl" alt="Custom icon preview">
+          </div>
+          <div v-else class="custom-icon-placeholder">
+            Drag and drop an image here or <button @click="triggerFileInput">choose a file</button>
+          </div>
+        </div>
+        <button class="btn btn-primary mt-3" @click="validateCustomIcon">Validate</button>
       </div>
     </div>
   </div>
@@ -16,34 +35,56 @@ export default {
   name: 'IconSelector',
   data() {
     return {
-      icons: [
+      basicIcons: [
         'fas fa-user-circle',
-        'fas fa-user-astronaut',
-        'fas fa-user-ninja',
-        'fas fa-user-secret',
+        'fas fa-user',
+        'fas fa-user-alt',
         'fas fa-user-tie',
-        'fas fa-user-graduate',
+        'fas fa-user-ninja',
+        'fas fa-user-astronaut',
         'fas fa-user-md',
-        'fas fa-user-nurse',
-        'fas fa-user-cog'
-      ]
-    }
+        'fas fa-user-secret',
+        'fas fa-user-graduate'
+      ],
+      customIcon: null,
+      previewUrl: null
+    };
   },
   methods: {
     selectIcon(icon) {
       this.$emit('select-icon', icon);
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      this.customIcon = file;
+      this.previewUrl = URL.createObjectURL(file);
+    },
+    handleDrop(event) {
+      const file = event.dataTransfer.files[0];
+      this.customIcon = file;
+      this.previewUrl = URL.createObjectURL(file);
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    validateCustomIcon() {
+      if (this.customIcon) {
+        this.$emit('select-icon', this.customIcon);
+      } else {
+        alert('Please select a custom icon first.');
+      }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.icon-selector-overlay {
+.icon-selector-backdrop {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -55,33 +96,61 @@ export default {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  max-width: 300px;
-  width: 100%;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.icon-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-selector-title {
+  margin: 0;
 }
 
 .icon-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .icon-item {
+  width: 50px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60px;
-  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .icon-item:hover {
-  background-color: #e0e0e0;
+  background-color: #f0f0f0;
 }
 
-.icon-item i {
-  font-size: 24px;
+.custom-icon-upload {
+  margin-top: 20px;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.custom-icon-placeholder {
+  color: #888;
+}
+
+.custom-icon-preview img {
+  max-width: 100%;
+  max-height: 100px;
+  object-fit: contain;
 }
 </style>
