@@ -4,7 +4,7 @@
       <div class="d-flex align-items-center">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
           <img src="/logo.png" alt="Logo" class="me-2" style="height: 30px;">
-          My App
+          Spella
         </router-link>
       </div>
       <div class="d-flex align-items-center">

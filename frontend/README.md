@@ -29,3 +29,13 @@ Pour aller sur le site (front) : http://localhost:8080
 
 Lancer serveur node: node server.js
 Pour voir tous les items : http://localhost:5000/items
+
+## Nom du projet : Spella
+
+## Description : Spella est une application web type "Twitter" qui a pour but de permettre aux utilisateurs de partager des tutoriels interactifs et conseils pour apprendre une nouvelle langue, pour tous les niveaux.
+
+## Techno utilisées :
+- VueJS
+- NodeJS
+- Express
+- MongoDB
