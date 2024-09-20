@@ -36,8 +36,8 @@
                 <span>{{ post.reposts ? post.reposts.length : 0 }}</span>
               </div>
               <div class="action" @click="sharePost(post)">
-                <i class="fas fa-share"></i>
-                <span>{{ post.shares ? post.shares.length : 0 }}</span>
+                <i :class="['fas', 'fa-share', { 'text-primary': isSharedByUser(post) }]"></i>
+                <span>{{ post.shares || 0 }}</span>
               </div>
             </div>
           </div>
@@ -71,10 +71,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['posts', 'isLoggedIn', 'user'])
+    ...mapState(['posts', 'isLoggedIn', 'user', 'userActivities'])
   },
   methods: {
-    ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment']),
+    ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment', 'fetchUserActivities']),
     handlePostCreated() {
       this.showCreatePostModal = false;
       this.fetchPosts();
@@ -146,10 +146,18 @@ export default {
       } else {
         console.error('Invalid post object:', post);
       }
+    },
+    isSharedByUser(post) {
+      return this.userActivities && this.userActivities.some(activity => 
+        activity.type === 'share' && activity.postId === post._id
+      );
     }
   },
-  created() {
-    this.fetchPosts();
+  async created() {
+    await this.fetchPosts();
+    if (this.isLoggedIn) {
+      await this.fetchUserActivities();
+    }
   }
 }
 </script>

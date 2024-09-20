@@ -342,3 +342,47 @@ app.get('/user/:userId/activities', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error fetching user activities' });
     }
 });
+
+// Endpoint pour partager un post
+app.post('/posts/:postId/share', verifyToken, async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const userId = req.userId;
+
+        console.log(`User ${userId} is toggling share for post ${postId}`);
+
+        const post = await Item.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        let activity = await Activity.findOne({ userId, postId, type: 'share' });
+        let action;
+
+        if (activity) {
+            // L'utilisateur a déjà partagé, donc on supprime le partage
+            await Activity.deleteOne({ _id: activity._id });
+            post.shares = Math.max(0, post.shares - 1);
+            action = 'unshared';
+        } else {
+            // L'utilisateur n'a pas encore partagé, donc on crée un nouveau partage
+            activity = new Activity({
+                userId: userId,
+                type: 'share',
+                postId: postId
+            });
+            await activity.save();
+            post.shares = (post.shares || 0) + 1;
+            action = 'shared';
+        }
+
+        await post.save();
+
+        console.log(`Share activity ${action}:`, activity);
+
+        res.json({ message: `Post ${action} successfully`, shares: post.shares, action });
+    } catch (error) {
+        console.error('Error in sharing post:', error);
+        res.status(500).json({ message: 'Error sharing post' });
+    }
+});

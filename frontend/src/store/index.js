@@ -32,6 +32,11 @@ export default createStore({
     addUserActivity(state, activity) {
       state.userActivities.unshift(activity);
     },
+    removeUserActivity(state, { type, postId }) {
+      state.userActivities = state.userActivities.filter(
+        activity => !(activity.type === type && activity.postId === postId)
+      );
+    },
     updatePostLikes(state, { postId, likes }) {
       const postIndex = state.posts.findIndex(post => post._id === postId);
       if (postIndex !== -1) {
@@ -47,7 +52,7 @@ export default createStore({
     updatePostShares(state, { postId, shares }) {
       const postIndex = state.posts.findIndex(post => post._id === postId);
       if (postIndex !== -1) {
-        state.posts[postIndex].shares = Array.isArray(shares) ? shares : [];
+        state.posts[postIndex].shares = shares;
       }
     }
   },
@@ -270,21 +275,41 @@ export default createStore({
       }
     },
     async sharePost({ commit, state }, postId) {
+      if (!postId) {
+        console.error('Invalid postId:', postId);
+        return { success: false };
+      }
       try {
         const response = await fetch(`http://localhost:5000/posts/${postId}/share`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${state.user.token}`
+            'Authorization': `Bearer ${state.user.token}`,
+            'Content-Type': 'application/json'
           }
         });
         if (response.ok) {
-          commit('addUserActivity', { type: 'shares', postId, date: new Date() });
+          const data = await response.json();
+          commit('updatePostShares', { postId, shares: data.shares });
+          if (data.action === 'shared') {
+            commit('addUserActivity', { type: 'share', postId, date: new Date() });
+          } else {
+            commit('removeUserActivity', { type: 'share', postId });
+          }
+          return { success: true, shares: data.shares, action: data.action };
+        } else {
+          console.error('Failed to share post:', await response.text());
+          return { success: false };
         }
       } catch (error) {
         console.error('Error sharing post:', error);
+        return { success: false };
       }
     },
     async fetchUserActivities({ commit, state }) {
+      if (!state.user || !state.user.userId) {
+        console.error('User not logged in');
+        return;
+      }
       try {
         console.log('Fetching user activities for user:', state.user.userId);
         const response = await fetch(`http://localhost:5000/user/${state.user.userId}/activities`, {

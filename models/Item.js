@@ -20,7 +20,8 @@ const ItemSchema = new mongoose.Schema({
         enum: ['item', 'post'],
         default: 'item'
     },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    shares: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('Item', ItemSchema);
