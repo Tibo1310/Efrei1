@@ -6,7 +6,8 @@ export default createStore({
     user: null,
     posts: [],
     isLoggedIn: false,
-    items: []
+    items: [],
+    userActivities: []
   },
   mutations: {
     setUser(state, user) {
@@ -24,6 +25,18 @@ export default createStore({
     },
     setUserProfile(state, profile) {
       state.user = { ...state.user, ...profile };
+    },
+    setUserActivities(state, activities) {
+      state.userActivities = activities;
+    },
+    addUserActivity(state, activity) {
+      state.userActivities.unshift(activity);
+    },
+    updatePostLikes(state, { postId, likes }) {
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].likes = Array.isArray(likes) ? likes : [];
+      }
     }
   },
   actions: {
@@ -183,6 +196,98 @@ export default createStore({
       } catch (error) {
         console.error('Error updating user profile:', error);
         return { success: false, message: error.message };
+      }
+    },
+    async likePost({ commit, state }, postId) {
+      if (!postId) {
+        console.error('Invalid postId:', postId);
+        return;
+      }
+      try {
+        const response = await fetch(`http://localhost:5000/posts/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.user.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          commit('updatePostLikes', { postId, likes: Array.isArray(data.likes) ? data.likes : [] });
+          commit('addUserActivity', { type: 'likes', postId, date: new Date() });
+        } else {
+          console.error('Failed to like post:', await response.text());
+        }
+      } catch (error) {
+        console.error('Error liking post:', error);
+      }
+    },
+    async addComment({ commit, state }, { postId, comment }) {
+      try {
+        const response = await fetch(`http://localhost:5000/posts/${postId}/comment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.user.token}`
+          },
+          body: JSON.stringify({ comment })
+        });
+        if (response.ok) {
+          commit('addUserActivity', { type: 'comments', postId, comment, date: new Date() });
+        }
+      } catch (error) {
+        console.error('Error adding comment:', error);
+      }
+    },
+    async repostPost({ commit, state }, postId) {
+      try {
+        const response = await fetch(`http://localhost:5000/posts/${postId}/repost`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.user.token}`
+          }
+        });
+        if (response.ok) {
+          commit('addUserActivity', { type: 'reposts', postId, date: new Date() });
+        }
+      } catch (error) {
+        console.error('Error reposting:', error);
+      }
+    },
+    async sharePost({ commit, state }, postId) {
+      try {
+        const response = await fetch(`http://localhost:5000/posts/${postId}/share`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.user.token}`
+          }
+        });
+        if (response.ok) {
+          commit('addUserActivity', { type: 'shares', postId, date: new Date() });
+        }
+      } catch (error) {
+        console.error('Error sharing post:', error);
+      }
+    },
+    async fetchUserActivities({ commit, state }) {
+      try {
+        console.log('Fetching user activities for user:', state.user.userId);
+        const response = await fetch(`http://localhost:5000/user/${state.user.userId}/activities`, {
+          headers: {
+            'Authorization': `Bearer ${state.user.token}`
+          }
+        });
+        if (response.ok) {
+          const activities = await response.json();
+          console.log('Fetched activities:', activities);
+          commit('setUserActivities', activities);
+        } else {
+          console.error('Failed to fetch user activities:', await response.text());
+          commit('setUserActivities', []);
+        }
+      } catch (error) {
+        console.error('Error fetching user activities:', error);
+        commit('setUserActivities', []);
       }
     }
   },

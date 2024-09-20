@@ -143,7 +143,7 @@ export default {
         if (result.success) {
           this.isEditing = false;
           await this.fetchUserProfile();
-          alert('Profile updated successfully. If you changed your password, please log out and log in again with your new password.');
+          alert('Profile updated successfully.');
         } else {
           throw new Error(result.message);
         }

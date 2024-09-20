@@ -27,19 +27,19 @@
               <span>{{ post.likes ? post.likes.length : 0 }} likes</span>
             </div>
             <div class="card-actions d-flex justify-content-between mt-2">
-              <div class="action">
+              <div class="action" @click="likePost(post)">
                 <i class="fas fa-thumbs-up"></i>
                 <span>J'aime</span>
               </div>
-              <div class="action">
+              <div class="action" @click="showCommentModalForPost(post)">
                 <i class="fas fa-comment"></i>
                 <span>Commenter</span>
               </div>
-              <div class="action">
+              <div class="action" @click="repostPost(post)">
                 <i class="fas fa-retweet"></i>
                 <span>Republier</span>
               </div>
-              <div class="action">
+              <div class="action" @click="sharePost(post)">
                 <i class="fas fa-share"></i>
                 <span>Partager</span>
               </div>
@@ -48,8 +48,9 @@
         </div>
       </div>
     </div>
-    <FloatingActionButton v-if="isLoggedIn" @click="showModal = true" />
-    <CreatePostModal v-if="showModal" @close="showModal = false" @post-created="handlePostCreated" />
+    <FloatingActionButton v-if="isLoggedIn" @click="showCreatePostModal = true" />
+    <CreatePostModal v-if="showCreatePostModal" @close="showCreatePostModal = false" @post-created="handlePostCreated" />
+    <CommentModal v-if="showCommentModal" :post="selectedPost" @close="showCommentModal = false" @comment-added="handleCommentAdded" />
   </div>
 </template>
 
@@ -57,30 +58,82 @@
 import { mapState, mapActions } from 'vuex';
 import FloatingActionButton from './FloatingActionButton.vue';
 import CreatePostModal from './CreatePostModal.vue';
+import CommentModal from './CommentModal.vue';
 
 export default {
   name: 'HomePage',
   components: {
     FloatingActionButton,
-    CreatePostModal
+    CreatePostModal,
+    CommentModal
   },
   data() {
     return {
-      showModal: false
+      showCreatePostModal: false,
+      showCommentModal: false,
+      selectedPost: null
     }
   },
   computed: {
     ...mapState(['posts', 'isLoggedIn'])
   },
+  methods: {
+    ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment']),
+    handlePostCreated() {
+      this.showCreatePostModal = false;
+      this.fetchPosts();
+    },
+    showCommentModalForPost(post) {
+      this.selectedPost = post;
+      this.showCommentModal = true;
+    },
+    handleCommentAdded(comment) {
+      this.addComment({ postId: this.selectedPost._id, comment });
+      this.showCommentModal = false;
+    },
+    async likePost(post) {
+      if (post && post._id) {
+        try {
+          await this.$store.dispatch('likePost', post._id);
+          // Mettre à jour le nombre de likes localement
+          const index = this.posts.findIndex(p => p._id === post._id);
+          if (index !== -1) {
+            const updatedPosts = [...this.posts];
+            const updatedPost = { ...updatedPosts[index] };
+            updatedPost.likes = Array.isArray(updatedPost.likes) ? updatedPost.likes : [];
+            const userIndex = updatedPost.likes.indexOf(this.$store.state.user.userId);
+            if (userIndex === -1) {
+              updatedPost.likes.push(this.$store.state.user.userId);
+            } else {
+              updatedPost.likes.splice(userIndex, 1);
+            }
+            updatedPosts[index] = updatedPost;
+            this.$store.commit('setPosts', updatedPosts);
+          }
+        } catch (error) {
+          console.error('Error liking post:', error);
+        }
+      } else {
+        console.error('Invalid post object:', post);
+      }
+    },
+    async repostPost(post) {
+      if (post && post._id) {
+        await this.repostPost(post._id);
+      } else {
+        console.error('Invalid post object:', post);
+      }
+    },
+    async sharePost(post) {
+      if (post && post._id) {
+        await this.sharePost(post._id);
+      } else {
+        console.error('Invalid post object:', post);
+      }
+    }
+  },
   created() {
     this.fetchPosts();
-  },
-  methods: {
-    ...mapActions(['fetchPosts']),
-    handlePostCreated() {
-      this.showModal = false;
-      this.fetchPosts();
-    }
   }
 }
 </script>

@@ -250,3 +250,87 @@ app.put('/user/:userId', verifyToken, async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+// Endpoint to like a post
+app.post('/posts/:postId/like', verifyToken, async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const userId = req.userId;
+
+        console.log(`User ${userId} is liking post ${postId}`);
+
+        const post = await Item.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        const likeIndex = post.likes.indexOf(userId);
+        if (likeIndex > -1) {
+            post.likes.splice(likeIndex, 1);
+        } else {
+            post.likes.push(userId);
+        }
+
+        await post.save();
+
+        // Créer une nouvelle activité
+        const activity = new Activity({
+            userId: userId,
+            type: 'like',
+            postId: postId
+        });
+        await activity.save();
+
+        console.log('Activity created:', activity);
+
+        res.json({ message: 'Like updated successfully', likes: post.likes.length });
+    } catch (error) {
+        console.error('Error in liking post:', error);
+        res.status(500).json({ message: 'Error updating like' });
+    }
+});
+
+// Ajouter cet endpoint à votre fichier server.js
+app.get('/user/:userId/activities', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        console.log('Fetching activities for user:', userId);
+        const activities = await Activity.find({ userId })
+            .populate('postId')
+            .sort('-date')
+            .limit(50);
+
+        console.log('Activities found:', activities.length);
+        res.json(activities);
+    } catch (error) {
+        console.error('Error fetching user activities:', error);
+        res.status(500).json({ message: 'Error fetching user activities' });
+    }
+});
+
+// Créez un modèle pour les activités si vous ne l'avez pas déjà fait
+const ActivitySchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    type: String,
+    postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+    date: { type: Date, default: Date.now },
+    comment: String // Pour les activités de type 'comment'
+});
+
+const Activity = mongoose.model('Activity', ActivitySchema);
+
+// Endpoint pour récupérer les activités de l'utilisateur
+app.get('/user/:userId/activities', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const activities = await Activity.find({ userId })
+            .populate('postId')
+            .sort('-date')
+            .limit(50); // Limitez à 50 activités les plus récentes
+
+        res.json(activities);
+    } catch (error) {
+        console.error('Error fetching user activities:', error);
+        res.status(500).json({ message: 'Error fetching user activities' });
+    }
+});

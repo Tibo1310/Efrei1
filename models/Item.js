@@ -19,7 +19,8 @@ const ItemSchema = new mongoose.Schema({
         type: String,
         enum: ['item', 'post'],
         default: 'item'
-    }
+    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 module.exports = mongoose.model('Item', ItemSchema);

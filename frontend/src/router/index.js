@@ -9,6 +9,7 @@ import TermsOfService from '../components/TermsOfService.vue';
 import ContactUs from '../components/ContactUs.vue';
 import UserProfile from '../components/UserProfile.vue'; // Import the UserProfile component
 import store from '../store'; // Importez le store
+import UserActivity from '../components/UserActivity.vue'; // Import the Activity component
 
 const routes = [
   {
@@ -56,6 +57,12 @@ const routes = [
     name: 'UserProfile',
     component: UserProfile,
     meta: { requiresAuth: true } // Ajoutez cette ligne pour indiquer que cette route nécessite une authentification
+  },
+  {
+    path: '/activity',
+    name: 'UserActivity',
+    component: UserActivity,
+    meta: { requiresAuth: true }
   }
 ];
 
