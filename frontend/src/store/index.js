@@ -265,6 +265,8 @@ export default createStore({
           throw new Error('Failed to add comment');
         }
         const data = await response.json();
+        // Assurez-vous que l'icône de l'utilisateur est incluse dans le commentaire
+        data.comment.user = { icon: userIcon };
         commit('addCommentToPost', { postId, comment: data.comment });
         return data.comment;
       } catch (error) {

@@ -55,8 +55,12 @@ export default {
           const addedComment = await this.$store.dispatch('addComment', {
             postId: this.post._id,
             comment: this.newComment,
-            userIcon: this.user.icon // Use the icon from the Vuex store
+            userIcon: this.user.icon
           });
+          // Ajoutez l'icône de l'utilisateur au commentaire avant de l'émettre
+          addedComment.user = {
+            icon: this.user.icon
+          };
           this.$emit('comment-added', addedComment);
           this.newComment = '';
         } catch (error) {

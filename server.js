@@ -318,7 +318,7 @@ app.post('/posts/:postId/comment', verifyToken, async (req, res) => {
         const newComment = {
             user: userId,
             username: user.username,
-            userIcon: user.icon, // Utilisez l'icône de l'utilisateur stockée dans la base de données
+            userIcon: userIcon || user.icon, // Utilisez l'icône fournie ou celle de l'utilisateur
             text: comment,
             date: new Date()
         };
