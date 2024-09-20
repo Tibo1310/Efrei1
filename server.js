@@ -296,7 +296,13 @@ app.get('/user/:userId/activities', verifyToken, async (req, res) => {
         const userId = req.params.userId;
         console.log('Fetching activities for user:', userId);
         const activities = await Activity.find({ userId })
-            .populate('postId')
+            .populate({
+                path: 'postId',
+                populate: {
+                    path: 'author',
+                    select: 'username icon followers'
+                }
+            })
             .sort('-date')
             .limit(50);
 
