@@ -22,26 +22,22 @@
             <div v-if="post.mediaUrl" class="card-img-wrapper">
               <img :src="`http://localhost:5000${post.mediaUrl}`" class="card-img" alt="Post media">
             </div>
-            <div class="card-footer d-flex justify-content-between">
-              <span>{{ post.comments ? post.comments.length : 0 }} commentaires</span>
-              <span>{{ post.likes ? post.likes.length : 0 }} likes</span>
-            </div>
             <div class="card-actions d-flex justify-content-between mt-2">
               <div class="action" @click="likePost(post)">
                 <i :class="['fas', 'fa-thumbs-up', { 'text-primary': isLikedByUser(post) }]"></i>
-                <span>J'aime</span>
+                <span>{{ post.likes ? post.likes.length : 0 }}</span>
               </div>
               <div class="action" @click="showCommentModalForPost(post)">
                 <i class="fas fa-comment"></i>
-                <span>Commenter</span>
+                <span>{{ post.comments ? post.comments.length : 0 }}</span>
               </div>
               <div class="action" @click="repostPost(post)">
                 <i class="fas fa-retweet"></i>
-                <span>Republier</span>
+                <span>{{ post.reposts ? post.reposts.length : 0 }}</span>
               </div>
               <div class="action" @click="sharePost(post)">
                 <i class="fas fa-share"></i>
-                <span>Partager</span>
+                <span>{{ post.shares ? post.shares.length : 0 }}</span>
               </div>
             </div>
           </div>
@@ -96,7 +92,6 @@ export default {
         try {
           const result = await this.$store.dispatch('likePost', post._id);
           if (result.success) {
-            // Mettre à jour le nombre de likes localement
             const index = this.posts.findIndex(p => p._id === post._id);
             if (index !== -1) {
               const updatedPosts = [...this.posts];
@@ -116,14 +111,38 @@ export default {
     },
     async repostPost(post) {
       if (post && post._id) {
-        await this.repostPost(post._id);
+        try {
+          const result = await this.$store.dispatch('repostPost', post._id);
+          if (result.success) {
+            const index = this.posts.findIndex(p => p._id === post._id);
+            if (index !== -1) {
+              const updatedPosts = [...this.posts];
+              updatedPosts[index] = { ...updatedPosts[index], reposts: result.reposts };
+              this.$store.commit('setPosts', updatedPosts);
+            }
+          }
+        } catch (error) {
+          console.error('Error reposting:', error);
+        }
       } else {
         console.error('Invalid post object:', post);
       }
     },
     async sharePost(post) {
       if (post && post._id) {
-        await this.sharePost(post._id);
+        try {
+          const result = await this.$store.dispatch('sharePost', post._id);
+          if (result.success) {
+            const index = this.posts.findIndex(p => p._id === post._id);
+            if (index !== -1) {
+              const updatedPosts = [...this.posts];
+              updatedPosts[index] = { ...updatedPosts[index], shares: result.shares };
+              this.$store.commit('setPosts', updatedPosts);
+            }
+          }
+        } catch (error) {
+          console.error('Error sharing post:', error);
+        }
       } else {
         console.error('Invalid post object:', post);
       }
@@ -181,25 +200,24 @@ export default {
 }
 
 .card-actions {
-  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
   padding-top: 10px;
 }
 
 .action {
   display: flex;
-  flex-direction: column;
   align-items: center;
   cursor: pointer;
 }
 
 .action i {
   font-size: 1.2rem;
-  color: #007bff;
+  margin-right: 5px;
 }
 
 .action span {
   font-size: 0.9rem;
-  color: #007bff;
 }
 
 .text-primary {

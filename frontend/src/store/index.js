@@ -37,6 +37,18 @@ export default createStore({
       if (postIndex !== -1) {
         state.posts[postIndex].likes = Array.isArray(likes) ? likes : [];
       }
+    },
+    updatePostReposts(state, { postId, reposts }) {
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].reposts = Array.isArray(reposts) ? reposts : [];
+      }
+    },
+    updatePostShares(state, { postId, shares }) {
+      const postIndex = state.posts.findIndex(post => post._id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].shares = Array.isArray(shares) ? shares : [];
+      }
     }
   },
   actions: {
