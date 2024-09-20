@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
     <div class="container">
       <div class="d-flex align-items-center">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
@@ -93,6 +93,11 @@ export default {
 </script>
 
 <style scoped>
+.custom-navbar {
+  background-color: #17255A;
+  border-bottom: 2px solid white;
+}
+
 .navbar {
   box-shadow: 0 2px 4px rgba(0,0,0,.1);
 }
