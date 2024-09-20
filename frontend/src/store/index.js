@@ -24,11 +24,7 @@ export default createStore({
   },
   actions: {
     login({ commit }, user) {
-      commit('setUser', {
-        ...user,
-        knownLanguages: user.knownLanguages || [],
-        learningLanguages: user.learningLanguages || []
-      })
+      commit('setUser', user)
       localStorage.setItem('token', user.token)
       localStorage.setItem('username', user.username)
       localStorage.setItem('userId', user.userId)
@@ -141,53 +137,6 @@ export default createStore({
       } catch (error) {
         console.error('Error updating icon:', error);
         throw error;
-      }
-    },
-    async updateProfile({ commit, state }, profileData) {
-      try {
-        const response = await fetch(`http://localhost:5000/user/${state.user.userId}`, {
-          method: 'PATCH', // Utilisez PATCH au lieu de PUT pour des mises à jour partielles
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${state.user.token}`
-          },
-          body: JSON.stringify(profileData)
-        });
-        
-        if (!response.ok) {
-          const error = await response.json();
-          return { success: false, message: error.message };
-        }
-        
-        const data = await response.json();
-        commit('setUser', { ...state.user, ...data });
-        if (data.username) localStorage.setItem('username', data.username);
-        if (data.icon) localStorage.setItem('userIcon', data.icon);
-        return { success: true };
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        return { success: false, message: 'An error occurred while updating the profile' };
-      }
-    },
-    async fetchUserProfile({ commit, state }) {
-      try {
-        const response = await fetch(`http://localhost:5000/user/${state.user.userId}`, {
-          headers: {
-            'Authorization': `Bearer ${state.user.token}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch user profile');
-        }
-        const userData = await response.json();
-        commit('setUser', {
-          ...state.user,
-          ...userData,
-          knownLanguages: userData.knownLanguages || [],
-          learningLanguages: userData.learningLanguages || []
-        });
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
       }
     }
   },

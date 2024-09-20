@@ -29,8 +29,9 @@
       <div class="mb-3">
         <label class="form-label">Known Languages:</label>
         <div v-for="(lang, index) in knownLanguages" :key="index" class="d-flex mb-2">
-          <select v-model="lang.language" class="form-select me-2">
-            <option v-for="language in languages" :key="language" :value="language">
+          <select v-model="lang.language" class="form-select me-2" @change="updateAvailableLanguages">
+            <option value="">Select a language</option>
+            <option v-for="language in getAvailableKnownLanguages(index)" :key="language" :value="language">
               {{ language }}
             </option>
           </select>
@@ -42,20 +43,21 @@
           </select>
           <button @click.prevent="removeKnownLanguage(index)" class="btn btn-danger ms-2">Remove</button>
         </div>
-        <button @click.prevent="addKnownLanguage" class="btn btn-secondary">Add Known Language</button>
+        <button @click.prevent="addKnownLanguage" class="btn btn-secondary" :disabled="knownLanguages.length >= 5 || getAvailableKnownLanguages().length === 0">Add Known Language</button>
       </div>
       
       <div class="mb-3">
         <label class="form-label">Learning Languages:</label>
         <div v-for="(lang, index) in learningLanguages" :key="index" class="d-flex mb-2">
-          <select v-model="learningLanguages[index]" class="form-select">
-            <option v-for="language in languages" :key="language" :value="language">
+          <select v-model="learningLanguages[index]" class="form-select" @change="updateAvailableLanguages">
+            <option value="">Select a language</option>
+            <option v-for="language in getAvailableLearningLanguages(index)" :key="language" :value="language">
               {{ language }}
             </option>
           </select>
           <button @click.prevent="removeLearningLanguage(index)" class="btn btn-danger ms-2">Remove</button>
         </div>
-        <button @click.prevent="addLearningLanguage" class="btn btn-secondary">Add Learning Language</button>
+        <button @click.prevent="addLearningLanguage" class="btn btn-secondary" :disabled="learningLanguages.length >= 3 || getAvailableLearningLanguages().length === 0">Add Learning Language</button>
       </div>
       
       <button type="submit" class="btn btn-primary w-100">Register</button>
@@ -88,7 +90,7 @@ export default {
         { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
         { code: 'IN', name: 'India', flag: '🇮🇳' },
       ],
-      languages: [
+      allLanguages: [
         'English', 'French', 'Spanish', 'German', 'Italian', 'Chinese', 'Japanese',
         'Portuguese', 'Russian', 'Arabic', 'Hindi', 'Korean', 'Dutch', 'Swedish',
         'Greek', 'Turkish', 'Polish', 'Vietnamese', 'Thai', 'Indonesian'
@@ -97,17 +99,56 @@ export default {
   },
   methods: {
     ...mapActions(['register']),
+    updateAvailableLanguages() {
+      // Cette méthode n'est plus nécessaire, mais nous la gardons pour la compatibilité
+    },
+    getAvailableKnownLanguages(currentIndex) {
+      const usedLanguages = new Set(
+        this.knownLanguages
+          .filter((lang, index) => index !== currentIndex && lang.language !== '')
+          .map(lang => lang.language)
+          .concat(this.learningLanguages.filter(lang => lang !== ''))
+      );
+      return this.allLanguages.filter(lang => !usedLanguages.has(lang));
+    },
+    getAvailableLearningLanguages(currentIndex) {
+      const usedLanguages = new Set(
+        this.learningLanguages
+          .filter((lang, index) => index !== currentIndex && lang !== '')
+          .concat(this.knownLanguages.filter(lang => lang.language !== '').map(lang => lang.language))
+      );
+      return this.allLanguages.filter(lang => !usedLanguages.has(lang));
+    },
+    addKnownLanguage() {
+      if (this.knownLanguages.length < 5 && this.getAvailableKnownLanguages().length > 0) {
+        this.knownLanguages.push({ language: '', level: 'beginner' });
+      }
+    },
+    removeKnownLanguage(index) {
+      this.knownLanguages.splice(index, 1);
+    },
+    addLearningLanguage() {
+      if (this.learningLanguages.length < 3 && this.getAvailableLearningLanguages().length > 0) {
+        this.learningLanguages.push('');
+      }
+    },
+    removeLearningLanguage(index) {
+      this.learningLanguages.splice(index, 1);
+    },
     async handleRegister() {
-      const result = await this.register({
+      const userData = {
         username: this.username,
         email: this.email,
         password: this.password,
         nationality: this.nationality,
         knownLanguages: this.knownLanguages.filter(lang => lang.language !== ''),
         learningLanguages: this.learningLanguages.filter(lang => lang !== '')
-      });
+      };
+      
+      console.log('User data being sent:', userData);
+      
+      const result = await this.register(userData);
       if (result.success) {
-        // The user is now automatically logged in, so we can redirect to the home page
         this.$router.push('/');
       } else {
         alert(result.message);

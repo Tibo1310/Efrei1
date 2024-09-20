@@ -116,6 +116,8 @@ app.post('/register', async (req, res) => {
     try {
         const { username, email, password, nationality, knownLanguages, learningLanguages } = req.body;
         
+        console.log('Received registration data:', { username, email, nationality, knownLanguages, learningLanguages });
+        
         const user = new User({ 
             username, 
             email, 

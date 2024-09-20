@@ -40,7 +40,7 @@
         <div v-for="(lang, index) in knownLanguages" :key="index" class="d-flex align-items-center mb-2">
           <div>{{ lang.language }} - {{ lang.level }}</div>
           <button @click="removeKnownLanguage(index)" class="btn btn-outline-danger ms-2"><i class="fas fa-trash"></i></button>
-          <button @click="updateKnownLanguage(index)" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
+          <button @click="updateKnownLanguage" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
         </div>
         <div class="d-flex mb-2">
           <select v-model="newKnownLanguage.language" class="form-select me-2">
@@ -62,7 +62,7 @@
         <div v-for="(lang, index) in learningLanguages" :key="index" class="d-flex align-items-center mb-2">
           <div>{{ lang }}</div>
           <button @click="removeLearningLanguage(index)" class="btn btn-outline-danger ms-2"><i class="fas fa-trash"></i></button>
-          <button @click="updateLearningLanguage(index)" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
+          <button @click="updateLearningLanguage" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
         </div>
         <div class="d-flex mb-2">
           <select v-model="newLearningLanguage" class="form-select me-2">
@@ -116,27 +116,43 @@ export default {
     ...mapState(['user'])
   },
   async created() {
+    console.log('UserProfile component created');
     await this.initializeUserData();
   },
   methods: {
     ...mapActions(['updateProfile', 'fetchUserProfile']),
     async initializeUserData() {
+      console.log('Initializing user data');
       this.isLoading = true;
       await this.fetchUserProfile();
+      console.log('User profile fetched:', this.user);
       this.updateLocalData();
       this.isLoading = false;
     },
     updateLocalData() {
+      console.log('Updating local data');
       if (this.user) {
+        console.log('User data:', this.user);
         this.username = this.user.username || '';
         this.email = this.user.email || '';
         this.nationality = this.user.nationality || '';
         this.knownLanguages = this.user.knownLanguages || [];
         this.learningLanguages = this.user.learningLanguages || [];
+        console.log('Local data updated:', {
+          username: this.username,
+          email: this.email,
+          nationality: this.nationality,
+          knownLanguages: this.knownLanguages,
+          learningLanguages: this.learningLanguages
+        });
+      } else {
+        console.log('No user data available');
       }
     },
     async updateField(field) {
+      console.log(`Updating field: ${field}`, this[field]);
       const result = await this.updateProfile({ [field]: this[field] });
+      console.log('Update result:', result);
       if (result.success) {
         alert(`${field} updated successfully`);
       } else {
@@ -144,9 +160,12 @@ export default {
       }
     },
     async addKnownLanguage() {
+      console.log('Adding known language:', this.newKnownLanguage);
       if (this.newKnownLanguage.language) {
         const updatedKnownLanguages = [...this.knownLanguages, { ...this.newKnownLanguage }];
+        console.log('Updated known languages:', updatedKnownLanguages);
         const result = await this.updateProfile({ knownLanguages: updatedKnownLanguages });
+        console.log('Update result:', result);
         if (result.success) {
           this.knownLanguages = updatedKnownLanguages;
           this.newKnownLanguage = { language: '', level: 'beginner' };
@@ -157,8 +176,11 @@ export default {
       }
     },
     async removeKnownLanguage(index) {
+      console.log('Removing known language at index:', index);
       const updatedKnownLanguages = this.knownLanguages.filter((_, i) => i !== index);
+      console.log('Updated known languages:', updatedKnownLanguages);
       const result = await this.updateProfile({ knownLanguages: updatedKnownLanguages });
+      console.log('Update result:', result);
       if (result.success) {
         this.knownLanguages = updatedKnownLanguages;
         alert('Known language removed successfully');
@@ -166,18 +188,23 @@ export default {
         alert(result.message);
       }
     },
-    async updateKnownLanguage(index) {
+    async updateKnownLanguage() {
+      console.log('Updating known languages:', this.knownLanguages);
       const result = await this.updateProfile({ knownLanguages: this.knownLanguages });
+      console.log('Update result:', result);
       if (result.success) {
-        alert('Known language updated successfully');
+        alert('Known languages updated successfully');
       } else {
         alert(result.message);
       }
     },
     async addLearningLanguage() {
+      console.log('Adding learning language:', this.newLearningLanguage);
       if (this.newLearningLanguage) {
         const updatedLearningLanguages = [...this.learningLanguages, this.newLearningLanguage];
+        console.log('Updated learning languages:', updatedLearningLanguages);
         const result = await this.updateProfile({ learningLanguages: updatedLearningLanguages });
+        console.log('Update result:', result);
         if (result.success) {
           this.learningLanguages = updatedLearningLanguages;
           this.newLearningLanguage = '';
@@ -188,8 +215,11 @@ export default {
       }
     },
     async removeLearningLanguage(index) {
+      console.log('Removing learning language at index:', index);
       const updatedLearningLanguages = this.learningLanguages.filter((_, i) => i !== index);
+      console.log('Updated learning languages:', updatedLearningLanguages);
       const result = await this.updateProfile({ learningLanguages: updatedLearningLanguages });
+      console.log('Update result:', result);
       if (result.success) {
         this.learningLanguages = updatedLearningLanguages;
         alert('Learning language removed successfully');
@@ -197,10 +227,12 @@ export default {
         alert(result.message);
       }
     },
-    async updateLearningLanguage(index) {
+    async updateLearningLanguage() {
+      console.log('Updating learning languages:', this.learningLanguages);
       const result = await this.updateProfile({ learningLanguages: this.learningLanguages });
+      console.log('Update result:', result);
       if (result.success) {
-        alert('Learning language updated successfully');
+        alert('Learning languages updated successfully');
       } else {
         alert(result.message);
       }
