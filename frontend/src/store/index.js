@@ -48,6 +48,21 @@ export default createStore({
       if (postIndex !== -1) {
         state.posts[postIndex].shares = shares;
       }
+    },
+    addCommentToPost(state, { postId, comment }) {
+      const post = state.posts.find(p => p._id === postId);
+      if (post) {
+        if (!post.comments) {
+          post.comments = [];
+        }
+        // Vérifier si le commentaire n'existe pas déjà avant de l'ajouter
+        if (!post.comments.some(c => c._id === comment._id)) {
+          post.comments.push(comment);
+        }
+      }
+    },
+    updatePost(state, { index, post }) {
+      state.posts.splice(index, 1, post);
     }
   },
   actions: {
@@ -246,11 +261,16 @@ export default createStore({
           },
           body: JSON.stringify({ comment })
         });
-        if (response.ok) {
-          commit('addUserActivity', { type: 'comments', postId, comment, date: new Date() });
+        if (!response.ok) {
+          throw new Error('Failed to add comment');
         }
+        const data = await response.json();
+        commit('addCommentToPost', { postId, comment: data.comment });
+        commit('addUserActivity', { type: 'comment', postId, comment, date: new Date() });
+        return data.comment;
       } catch (error) {
         console.error('Error adding comment:', error);
+        throw error;
       }
     },
     async sharePost({ commit, state }, postId) {

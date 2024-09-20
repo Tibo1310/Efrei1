@@ -1,18 +1,24 @@
 <template>
-  <div class="modal-backdrop" @click="$emit('close')">
-    <div class="modal-content" @click.stop>
-      <div class="modal-header">
-        <h5 class="modal-title">Ajouter un commentaire</h5>
-        <button type="button" class="close" @click="$emit('close')" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <textarea v-model="comment" class="form-control" rows="3" placeholder="Votre commentaire..."></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" @click="$emit('close')">Annuler</button>
-        <button type="button" class="btn btn-primary" @click="submitComment">Commenter</button>
+  <div class="modal" tabindex="-1" role="dialog" style="display: block; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Commentaires</h5>
+          <button type="button" class="btn-close" @click="$emit('close')" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="comments-list mb-3" style="max-height: 300px; overflow-y: auto;">
+            <div v-for="comment in post.comments" :key="comment._id" class="comment mb-2 p-2 border-bottom">
+              <strong>{{ comment.username }}</strong>
+              <p>{{ comment.text }}</p>
+              <small class="text-muted">{{ new Date(comment.date).toLocaleString() }}</small>
+            </div>
+          </div>
+          <div class="input-group">
+            <input type="text" class="form-control" v-model="newComment" placeholder="Ajouter un commentaire...">
+            <button class="btn btn-primary" @click="addComment" :disabled="isSubmitting">Envoyer</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -24,39 +30,29 @@ export default {
   props: ['post'],
   data() {
     return {
-      comment: ''
+      newComment: '',
+      isSubmitting: false
     };
   },
   methods: {
-    submitComment() {
-      if (this.comment.trim()) {
-        this.$emit('comment-added', this.comment);
-        this.comment = '';
+    async addComment() {
+      if (this.newComment.trim() && !this.isSubmitting) {
+        this.isSubmitting = true;
+        try {
+          const addedComment = await this.$store.dispatch('addComment', {
+            postId: this.post._id,
+            comment: this.newComment
+          });
+          this.$emit('comment-added', addedComment);
+          this.newComment = '';
+        } catch (error) {
+          console.error('Error adding comment:', error);
+          alert('Failed to add comment. Please try again.');
+        } finally {
+          this.isSubmitting = false;
+        }
       }
     }
   }
 };
 </script>
-
-<style scoped>
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-}
-</style>

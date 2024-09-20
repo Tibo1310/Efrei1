@@ -21,7 +21,13 @@ const ItemSchema = new mongoose.Schema({
         default: 'item'
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    shares: { type: Number, default: 0 }
+    shares: { type: Number, default: 0 },
+    comments: [{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        username: String,
+        text: String,
+        date: { type: Date, default: Date.now }
+    }]
 });
 
 module.exports = mongoose.model('Item', ItemSchema);

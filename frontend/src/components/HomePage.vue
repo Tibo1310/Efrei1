@@ -42,7 +42,12 @@
     </div>
     <FloatingActionButton v-if="isLoggedIn" @click="showCreatePostModal = true" />
     <CreatePostModal v-if="showCreatePostModal" @close="showCreatePostModal = false" @post-created="handlePostCreated" />
-    <CommentModal v-if="showCommentModal" :post="selectedPost" @close="showCommentModal = false" @comment-added="handleCommentAdded" />
+    <CommentModal 
+      v-if="showCommentModal" 
+      :post="selectedPost" 
+      @close="showCommentModal = false"
+      @comment-added="handleCommentAdded"
+    />
   </div>
 </template>
 
@@ -79,8 +84,19 @@ export default {
       this.selectedPost = post;
       this.showCommentModal = true;
     },
-    handleCommentAdded(comment) {
-      this.addComment({ postId: this.selectedPost._id, comment });
+    handleCommentAdded(newComment) {
+      const postIndex = this.posts.findIndex(p => p._id === this.selectedPost._id);
+      if (postIndex !== -1) {
+        const updatedPost = { ...this.posts[postIndex] };
+        if (!updatedPost.comments) {
+          updatedPost.comments = [];
+        }
+        // Vérifier si le commentaire n'existe pas déjà avant de l'ajouter
+        if (!updatedPost.comments.some(c => c._id === newComment._id)) {
+          updatedPost.comments.push(newComment);
+          this.$store.commit('updatePost', { index: postIndex, post: updatedPost });
+        }
+      }
       this.showCommentModal = false;
     },
     async likePost(post) {

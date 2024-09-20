@@ -292,7 +292,50 @@ app.post('/posts/:postId/like', verifyToken, async (req, res) => {
     }
 });
 
-// Ajouter cet endpoint à votre fichier server.js
+// Ajouter cet endpoint pour les commentaires
+app.post('/posts/:postId/comment', verifyToken, async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const userId = req.userId;
+        const { comment } = req.body;
+
+        const post = await Item.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const newComment = {
+            user: userId,
+            username: user.username,
+            text: comment,
+            date: new Date()
+        };
+
+        post.comments.push(newComment);
+        await post.save();
+
+        // Créer une nouvelle activité pour le commentaire
+        const activity = new Activity({
+            userId: userId,
+            type: 'comment',
+            postId: postId,
+            comment: comment
+        });
+        await activity.save();
+
+        res.status(201).json({ message: 'Comment added successfully', comment: newComment });
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ message: 'Error adding comment' });
+    }
+});
+
+// Endpoint pour récupérer les activités de l'utilisateur
 app.get('/user/:userId/activities', verifyToken, async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -326,22 +369,6 @@ const ActivitySchema = new mongoose.Schema({
 });
 
 const Activity = mongoose.model('Activity', ActivitySchema);
-
-// Endpoint pour récupérer les activités de l'utilisateur
-app.get('/user/:userId/activities', verifyToken, async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        const activities = await Activity.find({ userId })
-            .populate('postId')
-            .sort('-date')
-            .limit(50); // Limitez à 50 activités les plus récentes
-
-        res.json(activities);
-    } catch (error) {
-        console.error('Error fetching user activities:', error);
-        res.status(500).json({ message: 'Error fetching user activities' });
-    }
-});
 
 // Endpoint pour partager un post
 app.post('/posts/:postId/share', verifyToken, async (req, res) => {
