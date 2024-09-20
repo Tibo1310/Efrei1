@@ -35,7 +35,8 @@
         <div v-else>
           <div v-for="(lang, index) in editedUser.knownLanguages" :key="index" class="mb-2">
             <select v-model="lang.language" class="form-select me-2 d-inline-block w-auto">
-              <option v-for="language in availableLanguages" :key="language" :value="language">
+              <option value="">Select a language</option>
+              <option v-for="language in getAvailableKnownLanguages(index)" :key="language" :value="language">
                 {{ language }}
               </option>
             </select>
@@ -47,7 +48,7 @@
             </select>
             <button @click="removeKnownLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
           </div>
-          <button @click="addKnownLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="editedUser.knownLanguages.length >= 5">Add Known Language</button>
+          <button @click="addKnownLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddKnownLanguage">Add Known Language</button>
         </div>
       </div>
       <div class="mb-3">
@@ -60,13 +61,14 @@
         <div v-else>
           <div v-for="(lang, index) in editedUser.learningLanguages" :key="index" class="mb-2">
             <select v-model="editedUser.learningLanguages[index]" class="form-select me-2 d-inline-block w-auto">
-              <option v-for="language in availableLanguages" :key="language" :value="language">
+              <option value="">Select a language</option>
+              <option v-for="language in getAvailableLearningLanguages(index)" :key="language" :value="language">
                 {{ language }}
               </option>
             </select>
             <button @click="removeLearningLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
           </div>
-          <button @click="addLearningLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="editedUser.learningLanguages.length >= 3">Add Learning Language</button>
+          <button @click="addLearningLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddLearningLanguage">Add Learning Language</button>
         </div>
       </div>
       <div class="mb-3">
@@ -75,6 +77,7 @@
       </div>
       <button v-if="!isEditing" @click="startEditing" class="btn btn-primary">Modifier</button>
       <button v-else @click="saveChanges" class="btn btn-success">Valider</button>
+      <div v-if="errorMessage" class="text-danger mt-2">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
@@ -105,11 +108,18 @@ export default {
         'English', 'French', 'Spanish', 'German', 'Italian', 'Chinese', 'Japanese',
         'Portuguese', 'Russian', 'Arabic', 'Hindi', 'Korean', 'Dutch', 'Swedish',
         'Greek', 'Turkish', 'Polish', 'Vietnamese', 'Thai', 'Indonesian'
-      ]
+      ],
+      errorMessage: ''
     };
   },
   computed: {
-    ...mapState(['user'])
+    ...mapState(['user']),
+    canAddKnownLanguage() {
+      return this.editedUser.knownLanguages.length < 5 && this.getAvailableKnownLanguages().length > 0;
+    },
+    canAddLearningLanguage() {
+      return this.editedUser.learningLanguages.length < 3 && this.getAvailableLearningLanguages().length > 0;
+    }
   },
   methods: {
     ...mapActions(['fetchUserProfile', 'updateUserProfile']),
@@ -118,9 +128,12 @@ export default {
       this.isEditing = true;
     },
     async saveChanges() {
+      this.errorMessage = '';
+      if (!this.validateLanguages()) {
+        return;
+      }
       try {
         const updatedProfile = { ...this.editedUser };
-        // Envoyer le mot de passe seulement s'il a été modifié
         if (updatedProfile.password && updatedProfile.password.trim() !== '') {
           updatedProfile.password = updatedProfile.password.trim();
         } else {
@@ -139,33 +152,52 @@ export default {
         alert('Failed to update profile. Please try again.');
       }
     },
+    getAvailableKnownLanguages(currentIndex) {
+      const usedLanguages = new Set(
+        this.editedUser.knownLanguages
+          .filter((lang, index) => index !== currentIndex && lang.language !== '')
+          .map(lang => lang.language)
+          .concat(this.editedUser.learningLanguages)
+      );
+      return this.availableLanguages.filter(lang => !usedLanguages.has(lang));
+    },
+    getAvailableLearningLanguages(currentIndex) {
+      const usedLanguages = new Set(
+        this.editedUser.learningLanguages
+          .filter((lang, index) => index !== currentIndex && lang !== '')
+          .concat(this.editedUser.knownLanguages.map(lang => lang.language))
+      );
+      return this.availableLanguages.filter(lang => !usedLanguages.has(lang));
+    },
     addKnownLanguage() {
-      if (this.editedUser.knownLanguages.length < 5) {
-        const newLanguage = this.availableLanguages.find(lang => 
-          !this.editedUser.knownLanguages.some(known => known.language === lang) &&
-          !this.editedUser.learningLanguages.includes(lang)
-        );
-        if (newLanguage) {
-          this.editedUser.knownLanguages.push({ language: newLanguage, level: 'beginner' });
-        }
+      if (this.canAddKnownLanguage) {
+        this.editedUser.knownLanguages.push({ language: '', level: 'beginner' });
       }
     },
     removeKnownLanguage(index) {
       this.editedUser.knownLanguages.splice(index, 1);
     },
     addLearningLanguage() {
-      if (this.editedUser.learningLanguages.length < 3) {
-        const newLanguage = this.availableLanguages.find(lang => 
-          !this.editedUser.learningLanguages.includes(lang) &&
-          !this.editedUser.knownLanguages.some(known => known.language === lang)
-        );
-        if (newLanguage) {
-          this.editedUser.learningLanguages.push(newLanguage);
-        }
+      if (this.canAddLearningLanguage) {
+        this.editedUser.learningLanguages.push('');
       }
     },
     removeLearningLanguage(index) {
       this.editedUser.learningLanguages.splice(index, 1);
+    },
+    validateLanguages() {
+      const emptyKnownLanguage = this.editedUser.knownLanguages.some(lang => !lang.language);
+      const emptyLearningLanguage = this.editedUser.learningLanguages.some(lang => !lang);
+
+      if (emptyKnownLanguage) {
+        this.errorMessage = 'Please, choose a known language';
+        return false;
+      }
+      if (emptyLearningLanguage) {
+        this.errorMessage = 'Please, choose a learning language';
+        return false;
+      }
+      return true;
     }
   },
   async created() {
