@@ -31,10 +31,6 @@
                 <i class="fas fa-comment"></i>
                 <span>{{ post.comments ? post.comments.length : 0 }}</span>
               </div>
-              <div class="action" @click="repostPost(post)">
-                <i class="fas fa-retweet"></i>
-                <span>{{ post.reposts ? post.reposts.length : 0 }}</span>
-              </div>
               <div class="action" @click="sharePost(post)">
                 <i :class="['fas', 'fa-share', { 'text-primary': isSharedByUser(post) }]"></i>
                 <span>{{ post.shares || 0 }}</span>
@@ -88,6 +84,10 @@ export default {
       this.showCommentModal = false;
     },
     async likePost(post) {
+      if (!this.user || !this.user.userId) {
+        console.log('User not logged in');
+        return; // Ou rediriger vers la page de connexion
+      }
       if (post && post._id) {
         try {
           const result = await this.$store.dispatch('likePost', post._id);
@@ -107,7 +107,11 @@ export default {
       }
     },
     isLikedByUser(post) {
-      return Array.isArray(post.likes) && post.likes.includes(this.user.userId);
+      // Vérifier si l'utilisateur est connecté et si le post a des likes
+      if (this.user && this.user.userId && Array.isArray(post.likes)) {
+        return post.likes.includes(this.user.userId);
+      }
+      return false; // Retourner false si l'utilisateur n'est pas connecté ou si le post n'a pas de likes
     },
     async repostPost(post) {
       if (post && post._id) {
@@ -128,7 +132,16 @@ export default {
         console.error('Invalid post object:', post);
       }
     },
+    isSharedByUser(post) {
+      return this.userActivities && this.userActivities.some(activity => 
+        activity.type === 'share' && activity.postId._id === post._id
+      );
+    },
     async sharePost(post) {
+      if (!this.user || !this.user.userId) {
+        console.log('User not logged in');
+        return; // Ou rediriger vers la page de connexion
+      }
       if (post && post._id) {
         try {
           const result = await this.$store.dispatch('sharePost', post._id);
@@ -139,6 +152,8 @@ export default {
               updatedPosts[index] = { ...updatedPosts[index], shares: result.shares };
               this.$store.commit('setPosts', updatedPosts);
             }
+            // Mettre à jour les activités de l'utilisateur après le partage
+            await this.fetchUserActivities();
           }
         } catch (error) {
           console.error('Error sharing post:', error);
@@ -146,17 +161,22 @@ export default {
       } else {
         console.error('Invalid post object:', post);
       }
-    },
-    isSharedByUser(post) {
-      return this.userActivities && this.userActivities.some(activity => 
-        activity.type === 'share' && activity.postId === post._id
-      );
     }
   },
   async created() {
     await this.fetchPosts();
     if (this.isLoggedIn) {
       await this.fetchUserActivities();
+    }
+  },
+  watch: {
+    // Surveiller les changements dans userActivities
+    userActivities: {
+      handler() {
+        // Forcer une mise à jour du composant
+        this.$forceUpdate();
+      },
+      deep: true
     }
   }
 }

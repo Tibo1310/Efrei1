@@ -4,10 +4,13 @@ import { mapActions } from 'vuex';
 export default {
   name: 'App',
   methods: {
-    ...mapActions(['checkAuth'])
+    ...mapActions(['checkAuth', 'fetchUserActivities'])
   },
-  created() {
-    this.checkAuth();
+  async created() {
+    await this.checkAuth();
+    if (this.$store.getters.isLoggedIn) {
+      await this.fetchUserActivities();
+    }
   }
 }
 </script>

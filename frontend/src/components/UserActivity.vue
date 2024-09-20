@@ -4,7 +4,6 @@
     <div class="btn-group w-100 mb-4" role="group">
       <button @click="currentTab = 'like'" :class="['btn', currentTab === 'like' ? 'btn-primary' : 'btn-outline-primary']">Likes</button>
       <button @click="currentTab = 'comment'" :class="['btn', currentTab === 'comment' ? 'btn-primary' : 'btn-outline-primary']">Commentaires</button>
-      <button @click="currentTab = 'repost'" :class="['btn', currentTab === 'repost' ? 'btn-primary' : 'btn-outline-primary']">Republications</button>
       <button @click="currentTab = 'share'" :class="['btn', currentTab === 'share' ? 'btn-primary' : 'btn-outline-primary']">Partages</button>
     </div>
     <div v-if="isLoading">Chargement des activités...</div>

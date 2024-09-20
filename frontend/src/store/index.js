@@ -43,12 +43,6 @@ export default createStore({
         state.posts[postIndex].likes = Array.isArray(likes) ? likes : [];
       }
     },
-    updatePostReposts(state, { postId, reposts }) {
-      const postIndex = state.posts.findIndex(post => post._id === postId);
-      if (postIndex !== -1) {
-        state.posts[postIndex].reposts = Array.isArray(reposts) ? reposts : [];
-      }
-    },
     updatePostShares(state, { postId, shares }) {
       const postIndex = state.posts.findIndex(post => post._id === postId);
       if (postIndex !== -1) {
@@ -259,21 +253,6 @@ export default createStore({
         console.error('Error adding comment:', error);
       }
     },
-    async repostPost({ commit, state }, postId) {
-      try {
-        const response = await fetch(`http://localhost:5000/posts/${postId}/repost`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${state.user.token}`
-          }
-        });
-        if (response.ok) {
-          commit('addUserActivity', { type: 'reposts', postId, date: new Date() });
-        }
-      } catch (error) {
-        console.error('Error reposting:', error);
-      }
-    },
     async sharePost({ commit, state }, postId) {
       if (!postId) {
         console.error('Invalid postId:', postId);
@@ -328,6 +307,18 @@ export default createStore({
       } catch (error) {
         console.error('Error fetching user activities:', error);
         commit('setUserActivities', []);
+      }
+    },
+    async checkAuth({ commit, dispatch }) {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (token && userId) {
+        commit('setUser', { token, userId });
+        commit('setLoginStatus', true);
+        await dispatch('fetchUserActivities');
+      } else {
+        commit('setUser', null);
+        commit('setLoginStatus', false);
       }
     }
   },
