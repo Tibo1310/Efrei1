@@ -28,7 +28,7 @@
             </div>
             <div class="card-actions d-flex justify-content-between mt-2">
               <div class="action" @click="likePost(post)">
-                <i class="fas fa-thumbs-up"></i>
+                <i :class="['fas', 'fa-thumbs-up', { 'text-primary': isLikedByUser(post) }]"></i>
                 <span>J'aime</span>
               </div>
               <div class="action" @click="showCommentModalForPost(post)">
@@ -75,7 +75,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['posts', 'isLoggedIn'])
+    ...mapState(['posts', 'isLoggedIn', 'user'])
   },
   methods: {
     ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment']),
@@ -94,21 +94,15 @@ export default {
     async likePost(post) {
       if (post && post._id) {
         try {
-          await this.$store.dispatch('likePost', post._id);
-          // Mettre à jour le nombre de likes localement
-          const index = this.posts.findIndex(p => p._id === post._id);
-          if (index !== -1) {
-            const updatedPosts = [...this.posts];
-            const updatedPost = { ...updatedPosts[index] };
-            updatedPost.likes = Array.isArray(updatedPost.likes) ? updatedPost.likes : [];
-            const userIndex = updatedPost.likes.indexOf(this.$store.state.user.userId);
-            if (userIndex === -1) {
-              updatedPost.likes.push(this.$store.state.user.userId);
-            } else {
-              updatedPost.likes.splice(userIndex, 1);
+          const result = await this.$store.dispatch('likePost', post._id);
+          if (result.success) {
+            // Mettre à jour le nombre de likes localement
+            const index = this.posts.findIndex(p => p._id === post._id);
+            if (index !== -1) {
+              const updatedPosts = [...this.posts];
+              updatedPosts[index] = { ...updatedPosts[index], likes: result.likes };
+              this.$store.commit('setPosts', updatedPosts);
             }
-            updatedPosts[index] = updatedPost;
-            this.$store.commit('setPosts', updatedPosts);
           }
         } catch (error) {
           console.error('Error liking post:', error);
@@ -116,6 +110,9 @@ export default {
       } else {
         console.error('Invalid post object:', post);
       }
+    },
+    isLikedByUser(post) {
+      return Array.isArray(post.likes) && post.likes.includes(this.user.userId);
     },
     async repostPost(post) {
       if (post && post._id) {
@@ -203,5 +200,9 @@ export default {
 .action span {
   font-size: 0.9rem;
   color: #007bff;
+}
+
+.text-primary {
+  color: #007bff !important;
 }
 </style>

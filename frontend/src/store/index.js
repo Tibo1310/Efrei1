@@ -201,7 +201,7 @@ export default createStore({
     async likePost({ commit, state }, postId) {
       if (!postId) {
         console.error('Invalid postId:', postId);
-        return;
+        return { success: false };
       }
       try {
         const response = await fetch(`http://localhost:5000/posts/${postId}/like`, {
@@ -213,13 +213,16 @@ export default createStore({
         });
         if (response.ok) {
           const data = await response.json();
-          commit('updatePostLikes', { postId, likes: Array.isArray(data.likes) ? data.likes : [] });
+          commit('updatePostLikes', { postId, likes: data.likes });
           commit('addUserActivity', { type: 'likes', postId, date: new Date() });
+          return { success: true, likes: data.likes };
         } else {
           console.error('Failed to like post:', await response.text());
+          return { success: false };
         }
       } catch (error) {
         console.error('Error liking post:', error);
+        return { success: false };
       }
     },
     async addComment({ commit, state }, { postId, comment }) {

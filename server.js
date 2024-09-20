@@ -257,7 +257,7 @@ app.post('/posts/:postId/like', verifyToken, async (req, res) => {
         const postId = req.params.postId;
         const userId = req.userId;
 
-        console.log(`User ${userId} is liking post ${postId}`);
+        console.log(`User ${userId} is toggling like for post ${postId}`);
 
         const post = await Item.findById(postId);
         if (!post) {
@@ -273,19 +273,21 @@ app.post('/posts/:postId/like', verifyToken, async (req, res) => {
 
         await post.save();
 
-        // Créer une nouvelle activité
-        const activity = new Activity({
-            userId: userId,
-            type: 'like',
-            postId: postId
-        });
-        await activity.save();
+        // Mettre à jour ou créer l'activité
+        let activity = await Activity.findOne({ userId, postId, type: 'like' });
+        if (likeIndex === -1) {
+            if (!activity) {
+                activity = new Activity({ userId, postId, type: 'like' });
+            }
+            activity.date = new Date();
+            await activity.save();
+        } else if (activity) {
+            await Activity.deleteOne({ _id: activity._id });
+        }
 
-        console.log('Activity created:', activity);
-
-        res.json({ message: 'Like updated successfully', likes: post.likes.length });
+        res.json({ message: 'Like updated successfully', likes: post.likes });
     } catch (error) {
-        console.error('Error in liking post:', error);
+        console.error('Error in toggling like for post:', error);
         res.status(500).json({ message: 'Error updating like' });
     }
 });
