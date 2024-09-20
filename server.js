@@ -94,7 +94,13 @@ app.post('/posts', verifyToken, upload.single('media'), async (req, res) => {
 // Get all posts
 app.get('/posts', async (req, res) => {
     try {
-        const posts = await Item.find({ type: 'post' }).populate('author', 'username icon followers').sort('-dateCreated');
+        const posts = await Item.find({ type: 'post' })
+            .populate('author', 'username icon followers')
+            .populate({
+                path: 'comments.user',
+                select: 'username icon'
+            })
+            .sort('-dateCreated');
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -297,7 +303,7 @@ app.post('/posts/:postId/comment', verifyToken, async (req, res) => {
     try {
         const postId = req.params.postId;
         const userId = req.userId;
-        const { comment } = req.body;
+        const { comment, userIcon } = req.body;
 
         const post = await Item.findById(postId);
         if (!post) {
@@ -312,6 +318,7 @@ app.post('/posts/:postId/comment', verifyToken, async (req, res) => {
         const newComment = {
             user: userId,
             username: user.username,
+            userIcon: user.icon, // Utilisez l'icône de l'utilisateur stockée dans la base de données
             text: comment,
             date: new Date()
         };

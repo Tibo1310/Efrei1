@@ -9,7 +9,15 @@
         <div class="modal-body">
           <div class="comments-list mb-3" style="max-height: 300px; overflow-y: auto;">
             <div v-for="comment in post.comments" :key="comment._id" class="comment mb-2 p-2 border-bottom">
-              <strong>{{ comment.username }}</strong>
+              <div class="d-flex align-items-center mb-2">
+                <img v-if="comment.user && comment.user.icon && comment.user.icon.startsWith('/uploads/')" 
+                     :src="`http://localhost:5000${comment.user.icon}`" 
+                     class="user-icon me-2" 
+                     alt="User icon">
+                <i v-else :class="['me-2', comment.user && comment.user.icon ? comment.user.icon : 'fas fa-user-circle']" 
+                   style="font-size: 24px;"></i>
+                <strong>{{ comment.username }}</strong>
+              </div>
               <p>{{ comment.text }}</p>
               <small class="text-muted">{{ new Date(comment.date).toLocaleString() }}</small>
             </div>
@@ -25,6 +33,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'CommentModal',
   props: ['post'],
@@ -34,6 +44,9 @@ export default {
       isSubmitting: false
     };
   },
+  computed: {
+    ...mapState(['user'])
+  },
   methods: {
     async addComment() {
       if (this.newComment.trim() && !this.isSubmitting) {
@@ -41,7 +54,8 @@ export default {
         try {
           const addedComment = await this.$store.dispatch('addComment', {
             postId: this.post._id,
-            comment: this.newComment
+            comment: this.newComment,
+            userIcon: this.user.icon // Use the icon from the Vuex store
           });
           this.$emit('comment-added', addedComment);
           this.newComment = '';
@@ -56,3 +70,12 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.user-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+</style>

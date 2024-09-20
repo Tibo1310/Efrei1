@@ -251,7 +251,7 @@ export default createStore({
         return { success: false };
       }
     },
-    async addComment({ commit, state }, { postId, comment }) {
+    async addComment({ commit, state }, { postId, comment, userIcon }) {
       try {
         const response = await fetch(`http://localhost:5000/posts/${postId}/comment`, {
           method: 'POST',
@@ -259,14 +259,13 @@ export default createStore({
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${state.user.token}`
           },
-          body: JSON.stringify({ comment })
+          body: JSON.stringify({ comment, userIcon })
         });
         if (!response.ok) {
           throw new Error('Failed to add comment');
         }
         const data = await response.json();
         commit('addCommentToPost', { postId, comment: data.comment });
-        commit('addUserActivity', { type: 'comment', postId, comment, date: new Date() });
         return data.comment;
       } catch (error) {
         console.error('Error adding comment:', error);
@@ -332,8 +331,10 @@ export default createStore({
     async checkAuth({ commit, dispatch }) {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
+      const username = localStorage.getItem('username');
+      const icon = localStorage.getItem('userIcon');
       if (token && userId) {
-        commit('setUser', { token, userId });
+        commit('setUser', { token, userId, username, icon });
         commit('setLoginStatus', true);
         await dispatch('fetchUserActivities');
       } else {
