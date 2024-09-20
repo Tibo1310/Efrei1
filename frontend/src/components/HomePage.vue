@@ -7,14 +7,21 @@
     <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="post in posts" :key="post._id" class="col">
         <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex align-items-center">
-            <img v-if="post.author && post.author.icon && post.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${post.author.icon}`" class="user-icon me-2" />
-            <i v-else :class="[post.author ? post.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
-            <div>
-              <div class="username">{{ post.author ? post.author.username : 'Unknown' }}</div>
-              <div class="followers">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
-              <div class="post-date">{{ new Date(post.dateCreated).toLocaleDateString() }}</div>
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img v-if="post.author && post.author.icon && post.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${post.author.icon}`" class="user-icon me-2" />
+              <i v-else :class="[post.author ? post.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
+              <div>
+                <div class="username">{{ post.author ? post.author.username : 'Unknown' }}</div>
+                <div class="followers">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
+              </div>
             </div>
+            <button v-if="post.author && post.author._id !== user.userId" 
+                    @click="followUser(post.author._id)" 
+                    class="btn btn-sm" 
+                    :class="isFollowing(post.author._id) ? 'btn-secondary' : 'btn-primary'">
+              {{ isFollowing(post.author._id) ? 'Unfollow' : 'Follow' }}
+            </button>
           </div>
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ post.name }}</h5>
@@ -22,12 +29,15 @@
             <div v-if="post.mediaUrl" class="card-img-wrapper">
               <img :src="`http://localhost:5000${post.mediaUrl}`" class="card-img" alt="Post media">
             </div>
-            <div class="card-actions d-flex justify-content-between mt-2">
-              <div class="action" @click="likePost(post)">
+          </div>
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <div class="post-date">{{ new Date(post.dateCreated).toLocaleDateString() }}</div>
+            <div class="card-actions d-flex">
+              <div class="action me-3" @click="likePost(post)">
                 <i :class="['fas', 'fa-thumbs-up', { 'text-primary': isLikedByUser(post) }]"></i>
                 <span>{{ post.likes ? post.likes.length : 0 }}</span>
               </div>
-              <div class="action" @click="showCommentModalForPost(post)">
+              <div class="action me-3" @click="showCommentModalForPost(post)">
                 <i class="fas fa-comment"></i>
                 <span>{{ post.comments ? post.comments.length : 0 }}</span>
               </div>
@@ -75,7 +85,7 @@ export default {
     ...mapState(['posts', 'isLoggedIn', 'user', 'userActivities'])
   },
   methods: {
-    ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment', 'fetchUserActivities']),
+    ...mapActions(['fetchPosts', 'likePost', 'repostPost', 'sharePost', 'addComment', 'fetchUserActivities', 'followUser']),
     handlePostCreated() {
       this.showCreatePostModal = false;
       this.fetchPosts();
@@ -177,6 +187,26 @@ export default {
       } else {
         console.error('Invalid post object:', post);
       }
+    },
+    isFollowing(authorId) {
+      // Implémentez cette méthode pour vérifier si l'utilisateur suit déjà l'auteur
+      // Vous devrez probablement ajouter une propriété 'following' à l'objet user dans le store
+      return this.user && this.user.following && this.user.following.includes(authorId);
+    },
+    
+    async followUser(authorId) {
+      if (this.user && this.user.userId) {
+        try {
+          await this.$store.dispatch('followUser', authorId);
+          // Mettez à jour les posts ou l'utilisateur après le suivi
+          await this.fetchPosts();
+        } catch (error) {
+          console.error('Error following user:', error);
+        }
+      } else {
+        console.log('User not logged in');
+        // Rediriger vers la page de connexion ou afficher un message
+      }
     }
   },
   async created() {
@@ -237,16 +267,19 @@ export default {
 }
 
 .card-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 10px;
+}
+
+.post-date {
   font-size: 0.9rem;
   color: #6c757d;
-  border-top: 1px solid #e9ecef;
-  padding-top: 10px;
 }
 
 .card-actions {
   display: flex;
-  justify-content: space-between;
-  padding-top: 10px;
+  justify-content: flex-end;
 }
 
 .action {

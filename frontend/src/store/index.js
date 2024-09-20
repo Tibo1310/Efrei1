@@ -63,6 +63,11 @@ export default createStore({
     },
     updatePost(state, { index, post }) {
       state.posts.splice(index, 1, post);
+    },
+    updateUserFollowing(state, followingList) {
+      if (state.user) {
+        state.user.following = followingList;
+      }
     }
   },
   actions: {
@@ -342,6 +347,27 @@ export default createStore({
       } else {
         commit('setUser', null);
         commit('setLoginStatus', false);
+      }
+    },
+    async followUser({ commit, state }, authorId) {
+      try {
+        const response = await fetch(`http://localhost:5000/user/follow/${authorId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.user.token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          commit('updateUserFollowing', data.following);
+          return { success: true };
+        } else {
+          throw new Error('Failed to follow user');
+        }
+      } catch (error) {
+        console.error('Error following user:', error);
+        return { success: false, message: error.message };
       }
     }
   },
