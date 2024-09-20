@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import router from '../router'; // Assurez-vous d'importer le router
 
 export default createStore({
   state: {
@@ -40,6 +41,8 @@ export default createStore({
       localStorage.removeItem('username')
       localStorage.removeItem('userId')
       localStorage.removeItem('userIcon')
+      commit('setLoginStatus', false)
+      router.push('/login') // Rediriger vers la page de connexion après la déconnexion
     },
     fetchPosts({ commit }) {
       fetch('http://localhost:5000/posts')
@@ -158,6 +161,28 @@ export default createStore({
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
+      }
+    },
+    async updateUserProfile({ commit, state }, updatedProfile) {
+      try {
+        const response = await fetch(`http://localhost:5000/user/${state.user.userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.user.token}`
+          },
+          body: JSON.stringify(updatedProfile)
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update profile');
+        }
+        const updatedUser = await response.json();
+        commit('setUserProfile', updatedUser);
+        return { success: true };
+      } catch (error) {
+        console.error('Error updating user profile:', error);
+        return { success: false, message: error.message };
       }
     }
   },

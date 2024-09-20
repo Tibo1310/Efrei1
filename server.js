@@ -121,7 +121,7 @@ app.post('/register', async (req, res) => {
         const user = new User({ 
             username, 
             email, 
-            password, 
+            password, // Le mot de passe sera haché automatiquement grâce au middleware pre('save')
             nationality, 
             knownLanguages, 
             learningLanguages 
@@ -148,17 +148,31 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('Login attempt for email:', email);
+        
         const user = await User.findOne({ email });
         if (!user) {
+            console.log('User not found');
             return res.status(400).json({ message: 'User not found' });
         }
+        
+        console.log('User found, comparing passwords');
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
+            console.log('Password mismatch');
             return res.status(400).json({ message: 'Invalid credentials' });
         }
+        
+        console.log('Password match, generating token');
         const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ token, username: user.username, userId: user._id, icon: user.icon });
+        res.json({ 
+            token, 
+            username: user.username, 
+            userId: user._id, 
+            icon: user.icon 
+        });
     } catch (error) {
+        console.error('Login error:', error);
         res.status(400).json({ message: error.message });
     }
 });
@@ -204,5 +218,35 @@ app.get('/user/:userId', verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Error fetching user data:', error);
         res.status(500).json({ message: 'Error fetching user data' });
+    }
+});
+
+// Update user profile
+app.put('/user/:userId', verifyToken, async (req, res) => {
+    try {
+        const { username, email, password, nationality, knownLanguages, learningLanguages } = req.body;
+        
+        const user = await User.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Mise à jour des champs
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (password) user.password = password; // Le mot de passe sera haché automatiquement
+        if (nationality) user.nationality = nationality;
+        if (knownLanguages) user.knownLanguages = knownLanguages;
+        if (learningLanguages) user.learningLanguages = learningLanguages;
+
+        await user.save();
+        
+        // Renvoyer l'utilisateur sans le mot de passe
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        res.json(userResponse);
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(400).json({ message: error.message });
     }
 });

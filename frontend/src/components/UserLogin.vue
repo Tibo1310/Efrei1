@@ -32,25 +32,23 @@ export default {
       try {
         const response = await fetch('http://localhost:5000/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: this.email,
             password: this.password
           })
         });
+        const data = await response.json();
         if (response.ok) {
-          const data = await response.json();
-          await this.login(data); // Use the Vuex action to login
+          this.$store.dispatch('login', data);
           this.$router.push('/');
         } else {
-          const data = await response.json();
-          alert(data.message || 'Login failed');
+          console.error('Login failed:', data.message);
+          alert(`Login failed: ${data.message}`);
         }
       } catch (error) {
         console.error('Error during login:', error);
-        alert('An error occurred during login');
+        alert('An error occurred during login. Please try again.');
       }
     }
   }

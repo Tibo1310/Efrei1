@@ -8,6 +8,7 @@ import PrivacyPolicy from '../components/PrivacyPolicy.vue';
 import TermsOfService from '../components/TermsOfService.vue';
 import ContactUs from '../components/ContactUs.vue';
 import UserProfile from '../components/UserProfile.vue'; // Import the UserProfile component
+import store from '../store'; // Importez le store
 
 const routes = [
   {
@@ -53,13 +54,23 @@ const routes = [
   {
     path: '/profile',
     name: 'UserProfile',
-    component: UserProfile // Add the route for the profile page
+    component: UserProfile,
+    meta: { requiresAuth: true } // Ajoutez cette ligne pour indiquer que cette route nécessite une authentification
   }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+// Ajoutez un guard de navigation
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth) && !store.getters.isLoggedIn) {
+    next('/login');
+  } else {
+    next();
+  }
 });
 
 export default router;
