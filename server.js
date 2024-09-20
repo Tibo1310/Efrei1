@@ -193,12 +193,16 @@ app.put('/user/icon', verifyToken, upload.single('icon'), async (req, res) => {
 // Endpoint to fetch user profile
 app.get('/user/:userId', verifyToken, async (req, res) => {
     try {
+        console.log('Fetching user profile for userId:', req.params.userId);
         const user = await User.findById(req.params.userId).select('-password');
         if (!user) {
+            console.log('User not found');
             return res.status(404).json({ message: 'User not found' });
         }
+        console.log('User profile found:', user);
         res.json(user);
     } catch (error) {
+        console.error('Error fetching user data:', error);
         res.status(500).json({ message: 'Error fetching user data' });
     }
 });

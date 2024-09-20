@@ -3,75 +3,30 @@
     <h2 class="mb-4 text-center">Mon Profil</h2>
     <div v-if="isLoading">Chargement...</div>
     <div v-else class="border p-4 rounded shadow-sm bg-light">
-      <div class="mb-3 d-flex align-items-center">
-        <div class="flex-grow-1 me-2">
-          <label for="username" class="form-label">Username:</label>
-          <input type="text" id="username" v-model="username" class="form-control" required>
-        </div>
-        <button @click="updateField('username')" class="btn btn-outline-primary"><i class="fas fa-sync-alt"></i></button>
-      </div>
-      <div class="mb-3 d-flex align-items-center">
-        <div class="flex-grow-1 me-2">
-          <label for="email" class="form-label">Email:</label>
-          <input type="email" id="email" v-model="email" class="form-control" required>
-        </div>
-        <button @click="updateField('email')" class="btn btn-outline-primary"><i class="fas fa-sync-alt"></i></button>
-      </div>
-      <div class="mb-3 d-flex align-items-center">
-        <div class="flex-grow-1 me-2">
-          <label for="password" class="form-label">Password:</label>
-          <input type="password" id="password" v-model="password" class="form-control" placeholder="Enter new password">
-        </div>
-        <button @click="updateField('password')" class="btn btn-outline-primary"><i class="fas fa-sync-alt"></i></button>
-      </div>
-      <div class="mb-3 d-flex align-items-center">
-        <div class="flex-grow-1 me-2">
-          <label for="nationality" class="form-label">Nationality:</label>
-          <select id="nationality" v-model="nationality" class="form-select" required>
-            <option v-for="country in countries" :key="country.code" :value="country.code">
-              {{ country.flag }} {{ country.name }}
-            </option>
-          </select>
-        </div>
-        <button @click="updateField('nationality')" class="btn btn-outline-primary"><i class="fas fa-sync-alt"></i></button>
+      <div class="mb-3">
+        <strong>Username:</strong> {{ user.username }}
       </div>
       <div class="mb-3">
-        <label class="form-label">Known Languages:</label>
-        <div v-for="(lang, index) in knownLanguages" :key="index" class="d-flex align-items-center mb-2">
-          <div>{{ lang.language }} - {{ lang.level }}</div>
-          <button @click="removeKnownLanguage(index)" class="btn btn-outline-danger ms-2"><i class="fas fa-trash"></i></button>
-          <button @click="updateKnownLanguage" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
-        </div>
-        <div class="d-flex mb-2">
-          <select v-model="newKnownLanguage.language" class="form-select me-2">
-            <option v-for="language in languages" :key="language" :value="language">
-              {{ language }}
-            </option>
-          </select>
-          <select v-model="newKnownLanguage.level" class="form-select me-2">
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-            <option value="fluent">Fluent</option>
-          </select>
-          <button @click="addKnownLanguage" class="btn btn-secondary">Add</button>
-        </div>
+        <strong>Email:</strong> {{ user.email }}
       </div>
       <div class="mb-3">
-        <label class="form-label">Learning Languages:</label>
-        <div v-for="(lang, index) in learningLanguages" :key="index" class="d-flex align-items-center mb-2">
-          <div>{{ lang }}</div>
-          <button @click="removeLearningLanguage(index)" class="btn btn-outline-danger ms-2"><i class="fas fa-trash"></i></button>
-          <button @click="updateLearningLanguage" class="btn btn-outline-primary ms-2"><i class="fas fa-sync-alt"></i></button>
-        </div>
-        <div class="d-flex mb-2">
-          <select v-model="newLearningLanguage" class="form-select me-2">
-            <option v-for="language in languages" :key="language" :value="language">
-              {{ language }}
-            </option>
-          </select>
-          <button @click="addLearningLanguage" class="btn btn-secondary">Add</button>
-        </div>
+        <strong>Nationality:</strong> {{ user.nationality }}
+      </div>
+      <div class="mb-3">
+        <strong>Known Languages:</strong>
+        <ul>
+          <li v-for="lang in user.knownLanguages" :key="lang.language">
+            {{ lang.language }} - {{ lang.level }}
+          </li>
+        </ul>
+      </div>
+      <div class="mb-3">
+        <strong>Learning Languages:</strong>
+        <ul>
+          <li v-for="lang in user.learningLanguages" :key="lang">
+            {{ lang }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -84,158 +39,24 @@ export default {
   name: 'UserProfile',
   data() {
     return {
-      isLoading: true,
-      username: '',
-      email: '',
-      password: '',
-      nationality: '',
-      knownLanguages: [],
-      learningLanguages: [],
-      newKnownLanguage: { language: '', level: 'beginner' },
-      newLearningLanguage: '',
-      countries: [
-        { code: 'FR', name: 'France', flag: '🇫🇷' },
-        { code: 'US', name: 'United States', flag: '🇺🇸' },
-        { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-        { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-        { code: 'ES', name: 'Spain', flag: '🇪🇸' },
-        { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-        { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-        { code: 'CN', name: 'China', flag: '🇨🇳' },
-        { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-        { code: 'IN', name: 'India', flag: '🇮🇳' },
-      ],
-      languages: [
-        'English', 'French', 'Spanish', 'German', 'Italian', 'Chinese', 'Japanese',
-        'Portuguese', 'Russian', 'Arabic', 'Hindi', 'Korean', 'Dutch', 'Swedish',
-        'Greek', 'Turkish', 'Polish', 'Vietnamese', 'Thai', 'Indonesian'
-      ]
+      isLoading: true
     };
   },
   computed: {
     ...mapState(['user'])
   },
+  methods: {
+    ...mapActions(['fetchUserProfile'])
+  },
   async created() {
     console.log('UserProfile component created');
-    await this.initializeUserData();
-  },
-  methods: {
-    ...mapActions(['updateProfile', 'fetchUserProfile']),
-    async initializeUserData() {
-      console.log('Initializing user data');
-      this.isLoading = true;
+    try {
       await this.fetchUserProfile();
-      console.log('User profile fetched:', this.user);
-      this.updateLocalData();
+      console.log('User profile after fetch:', this.user);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    } finally {
       this.isLoading = false;
-    },
-    updateLocalData() {
-      console.log('Updating local data');
-      if (this.user) {
-        console.log('User data:', this.user);
-        this.username = this.user.username || '';
-        this.email = this.user.email || '';
-        this.nationality = this.user.nationality || '';
-        this.knownLanguages = this.user.knownLanguages || [];
-        this.learningLanguages = this.user.learningLanguages || [];
-        console.log('Local data updated:', {
-          username: this.username,
-          email: this.email,
-          nationality: this.nationality,
-          knownLanguages: this.knownLanguages,
-          learningLanguages: this.learningLanguages
-        });
-      } else {
-        console.log('No user data available');
-      }
-    },
-    async updateField(field) {
-      console.log(`Updating field: ${field}`, this[field]);
-      const result = await this.updateProfile({ [field]: this[field] });
-      console.log('Update result:', result);
-      if (result.success) {
-        alert(`${field} updated successfully`);
-      } else {
-        alert(result.message);
-      }
-    },
-    async addKnownLanguage() {
-      console.log('Adding known language:', this.newKnownLanguage);
-      if (this.newKnownLanguage.language) {
-        const updatedKnownLanguages = [...this.knownLanguages, { ...this.newKnownLanguage }];
-        console.log('Updated known languages:', updatedKnownLanguages);
-        const result = await this.updateProfile({ knownLanguages: updatedKnownLanguages });
-        console.log('Update result:', result);
-        if (result.success) {
-          this.knownLanguages = updatedKnownLanguages;
-          this.newKnownLanguage = { language: '', level: 'beginner' };
-          alert('Known language added successfully');
-        } else {
-          alert(result.message);
-        }
-      }
-    },
-    async removeKnownLanguage(index) {
-      console.log('Removing known language at index:', index);
-      const updatedKnownLanguages = this.knownLanguages.filter((_, i) => i !== index);
-      console.log('Updated known languages:', updatedKnownLanguages);
-      const result = await this.updateProfile({ knownLanguages: updatedKnownLanguages });
-      console.log('Update result:', result);
-      if (result.success) {
-        this.knownLanguages = updatedKnownLanguages;
-        alert('Known language removed successfully');
-      } else {
-        alert(result.message);
-      }
-    },
-    async updateKnownLanguage() {
-      console.log('Updating known languages:', this.knownLanguages);
-      const result = await this.updateProfile({ knownLanguages: this.knownLanguages });
-      console.log('Update result:', result);
-      if (result.success) {
-        alert('Known languages updated successfully');
-      } else {
-        alert(result.message);
-      }
-    },
-    async addLearningLanguage() {
-      console.log('Adding learning language:', this.newLearningLanguage);
-      if (this.newLearningLanguage) {
-        const updatedLearningLanguages = [...this.learningLanguages, this.newLearningLanguage];
-        console.log('Updated learning languages:', updatedLearningLanguages);
-        const result = await this.updateProfile({ learningLanguages: updatedLearningLanguages });
-        console.log('Update result:', result);
-        if (result.success) {
-          this.learningLanguages = updatedLearningLanguages;
-          this.newLearningLanguage = '';
-          alert('Learning language added successfully');
-        } else {
-          alert(result.message);
-        }
-      }
-    },
-    async removeLearningLanguage(index) {
-      console.log('Removing learning language at index:', index);
-      const updatedLearningLanguages = this.learningLanguages.filter((_, i) => i !== index);
-      console.log('Updated learning languages:', updatedLearningLanguages);
-      const result = await this.updateProfile({ learningLanguages: updatedLearningLanguages });
-      console.log('Update result:', result);
-      if (result.success) {
-        this.learningLanguages = updatedLearningLanguages;
-        alert('Learning language removed successfully');
-      } else {
-        alert(result.message);
-      }
-    },
-    async updateLearningLanguage() {
-      console.log('Updating learning languages:', this.learningLanguages);
-      const result = await this.updateProfile({ learningLanguages: this.learningLanguages });
-      console.log('Update result:', result);
-      if (result.success) {
-        alert('Learning languages updated successfully');
-      } else {
-        alert(result.message);
-      }
     }
   }
 };

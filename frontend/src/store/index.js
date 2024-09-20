@@ -20,6 +20,9 @@ export default createStore({
     },
     setItems(state, items) {
       state.items = items
+    },
+    setUserProfile(state, profile) {
+      state.user = { ...state.user, ...profile };
     }
   },
   actions: {
@@ -137,6 +140,24 @@ export default createStore({
       } catch (error) {
         console.error('Error updating icon:', error);
         throw error;
+      }
+    },
+    async fetchUserProfile({ commit, state }) {
+      try {
+        const response = await fetch(`http://localhost:5000/user/${state.user.userId}`, {
+          headers: {
+            'Authorization': `Bearer ${state.user.token}`
+          }
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('Fetched user profile:', userData);
+          commit('setUserProfile', userData);
+        } else {
+          console.error('Failed to fetch user profile');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
       }
     }
   },
