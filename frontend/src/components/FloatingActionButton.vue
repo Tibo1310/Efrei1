@@ -15,31 +15,31 @@ export default {
 <style scoped>
 .floating-action-button-container {
   position: fixed;
-  bottom: 70px; /* Increased to position above the footer */
+  bottom: 80px; /* Augmenté pour être au-dessus du footer */
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centré horizontalement */
   z-index: 1000;
 }
 
 .floating-action-button {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: black;
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 28px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .floating-action-button:hover {
-  background-color: #0056b3;
+  background-color: #333;
   transform: scale(1.1);
 }
 
@@ -47,16 +47,8 @@ export default {
   transition: font-size 0.3s ease;
 }
 
-/* Media queries for responsive sizing */
+/* Media queries pour un dimensionnement responsive */
 @media (min-width: 768px) {
-  .floating-action-button {
-    width: 70px;
-    height: 70px;
-    font-size: 28px;
-  }
-}
-
-@media (min-width: 1024px) {
   .floating-action-button {
     width: 80px;
     height: 80px;
@@ -64,11 +56,19 @@ export default {
   }
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1024px) {
   .floating-action-button {
     width: 90px;
     height: 90px;
     font-size: 36px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .floating-action-button {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
   }
 }
 </style>
