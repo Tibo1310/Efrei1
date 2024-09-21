@@ -15,7 +15,7 @@
           </div>
           <div class="form-group mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" v-model="description" rows="4" required placeholder="Write your post content here"></textarea>
+            <textarea class="form-control" id="description" v-model="description" rows="4" required placeholder="Write your post content here" style="resize: none;"></textarea>
           </div>
           <div class="form-group mb-3">
             <label for="media" class="form-label">Image (optional)</label>
@@ -24,10 +24,10 @@
               <label class="custom-file-label" for="media">{{ mediaLabel }}</label>
             </div>
           </div>
-          <div v-if="previewUrl" class="mb-3">
+          <div v-if="previewUrl" class="mb-3 text-center">
             <img :src="previewUrl" alt="Preview" class="img-preview">
           </div>
-          <button type="submit" class="btn btn-primary w-100">Publish</button>
+          <button type="submit" class="btn btn-dark w-100">Publish</button>
         </form>
       </div>
     </div>
@@ -105,6 +105,13 @@ export default {
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  border: 2px solid black;
+}
+
+.modal-header {
+  border-bottom: 1px solid black;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .close {
@@ -112,6 +119,11 @@ export default {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: black;
+}
+
+.form-control {
+  border: 1px solid black;
 }
 
 .custom-file {
@@ -143,7 +155,7 @@ export default {
   line-height: 1.5;
   color: #495057;
   background-color: #fff;
-  border: 1px solid #ced4da;
+  border: 1px solid black;
   border-radius: 0.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -154,6 +166,18 @@ export default {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+.btn-dark {
+  background-color: black;
+  border-color: black;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+  border-color: #333;
 }
 
 @media (max-width: 576px) {
