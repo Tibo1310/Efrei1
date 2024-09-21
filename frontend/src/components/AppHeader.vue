@@ -21,12 +21,13 @@
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
+          <!-- Supprimez ces deux éléments de liste -->
+          <!-- <li class="nav-item">
             <router-link class="nav-link" to="/create">Add Item</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/list">Item List</router-link>
-          </li>
+          </li> -->
           <template v-if="!isLoggedIn">
             <li class="nav-item">
               <router-link class="nav-link" to="/register">Register</router-link>
@@ -94,7 +95,7 @@ export default {
 
 <style scoped>
 .custom-navbar {
-  background-color: #17255A;
+  background-color: black;
   border-bottom: 2px solid white;
 }
 

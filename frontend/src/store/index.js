@@ -6,7 +6,6 @@ export default createStore({
     user: null,
     posts: [],
     isLoggedIn: false,
-    items: [],
     userActivities: []
   },
   mutations: {
@@ -19,9 +18,6 @@ export default createStore({
     },
     setLoginStatus(state, status) {
       state.isLoggedIn = status
-    },
-    setItems(state, items) {
-      state.items = items
     },
     setUserProfile(state, profile) {
       state.user = { ...state.user, ...profile };
@@ -148,19 +144,6 @@ export default createStore({
       } catch (error) {
         console.error('Error creating post:', error);
         return { success: false, message: 'An error occurred while creating the post' };
-      }
-    },
-    async fetchItems({ commit }) {
-      try {
-        const response = await fetch('http://localhost:5000/items');
-        if (response.ok) {
-          const items = await response.json();
-          commit('setItems', items);
-        } else {
-          console.error('Failed to fetch items');
-        }
-      } catch (error) {
-        console.error('Error fetching items:', error);
       }
     },
     async updateUserIcon({ commit, state }, icon) {

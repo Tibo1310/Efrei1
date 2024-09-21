@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center">Home Page</h2>
     <div v-if="posts.length === 0" class="text-center">
       <p>No posts yet. Be the first to create a post!</p>
     </div>
