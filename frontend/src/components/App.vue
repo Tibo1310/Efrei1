@@ -71,7 +71,7 @@ main {
 }
 
 body {
-  padding-top: 76px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
+  padding-top: 30px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
 }
 
 .content-wrapper {

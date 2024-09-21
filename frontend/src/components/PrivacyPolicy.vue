@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
-    <h1>Privacy Policy</h1>
-    <p>This is a sample privacy policy page. In a real application, this would contain detailed information about how user data is collected, used, and protected.</p>
+    <h1>Politique de confidentialité</h1>
+    <p>Voici la politique de confidentialité de notre application : blablabla.</p>
   </div>
 </template>
 
