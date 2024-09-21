@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center">Mon Profil</h2>
     <div v-if="isLoading">Chargement...</div>
     <div v-else-if="!user">
       <p class="text-center">Veuillez vous connecter pour voir votre profil.</p>

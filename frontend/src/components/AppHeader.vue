@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top" :class="{ 'navbar-hidden': isHidden }">
     <div class="container">
       <div class="d-flex align-items-center">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
@@ -65,7 +65,9 @@ export default {
   },
   data() {
     return {
-      showIconSelector: false
+      showIconSelector: false,
+      isHidden: false,
+      lastScrollPosition: 0
     }
   },
   computed: {
@@ -73,6 +75,10 @@ export default {
   },
   created() {
     this.checkLoginStatus();
+    window.addEventListener('scroll', this.onScroll);
+  },
+  unmounted() {
+    window.removeEventListener('scroll', this.onScroll);
   },
   methods: {
     ...mapActions(['logout', 'checkLoginStatus', 'updateUserIcon']),
@@ -88,6 +94,17 @@ export default {
         console.error('Error updating icon:', error);
         alert('Failed to update icon. Please try again.');
       }
+    },
+    onScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScrollPosition < 0) {
+        return;
+      }
+      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
+        return;
+      }
+      this.isHidden = currentScrollPosition > this.lastScrollPosition;
+      this.lastScrollPosition = currentScrollPosition;
     }
   }
 };
@@ -97,6 +114,11 @@ export default {
 .custom-navbar {
   background-color: black;
   border-bottom: 2px solid white;
+  transition: transform 0.3s ease;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
 }
 
 .navbar {

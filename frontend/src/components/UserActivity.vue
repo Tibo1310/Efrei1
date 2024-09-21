@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5">
-    <h2 class="mb-4 text-center">Mes Activités</h2>
     <div class="btn-group w-100 mb-4" role="group">
       <button @click="currentTab = 'like'" :class="['btn', currentTab === 'like' ? 'btn-primary' : 'btn-outline-primary']">Likes</button>
       <button @click="currentTab = 'comment'" :class="['btn', currentTab === 'comment' ? 'btn-primary' : 'btn-outline-primary']">Commentaires</button>

@@ -47,4 +47,16 @@ h1, h2, h3, h4, h5, h6 {
 main {
   padding-bottom: 70px; /* Increased padding to account for the fixed footer */
 }
+
+body {
+  padding-top: 30px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
+}
+
+.content-wrapper {
+  transition: margin-top 0.3s ease;
+}
+
+.navbar-hidden + .content-wrapper {
+  margin-top: 0;
+}
 </style>
