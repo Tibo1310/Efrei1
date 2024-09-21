@@ -1,33 +1,31 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top" :class="{ 'navbar-hidden': isHidden }">
     <div class="container">
-      <div class="d-flex align-items-center">
-        <router-link class="navbar-brand d-flex align-items-center" to="/">
-          <img src="/logo.png" alt="Logo" class="me-2" style="height: 30px;">
-          Spella
-        </router-link>
-      </div>
-      <div class="d-flex align-items-center">
-        <div v-if="isLoggedIn" class="d-flex align-items-center me-3">
-          <span class="text-light me-2">{{ username }}</span>
-          <div class="user-icon" @click="showIconSelector = true">
-            <img v-if="userIcon && userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" />
-            <i v-else :class="userIcon"></i>
-          </div>
-        </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
+      <!-- Logo et nom de l'application -->
+      <router-link class="navbar-brand d-flex align-items-center" to="/">
+        <img src="/logo.png" alt="Logo" class="me-2" style="height: 30px;">
+        Spella
+      </router-link>
+
+      <!-- Bouton de bascule pour les petits écrans -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Contenu de la barre de navigation -->
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <!-- Supprimez ces deux éléments de liste -->
-          <!-- <li class="nav-item">
-            <router-link class="nav-link" to="/create">Add Item</router-link>
+        <ul class="navbar-nav mx-auto">
+          <!-- Liens du milieu (visibles uniquement sur desktop et pour les utilisateurs connectés) -->
+          <li class="nav-item d-none d-lg-block" v-if="isLoggedIn">
+            <router-link class="nav-link" to="/profile">Mon profil</router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/list">Item List</router-link>
-          </li> -->
+          <li class="nav-item d-none d-lg-block" v-if="isLoggedIn">
+            <router-link class="nav-link" to="/activity">Mes activités</router-link>
+          </li>
+        </ul>
+
+        <!-- Éléments de droite -->
+        <ul class="navbar-nav ms-auto">
           <template v-if="!isLoggedIn">
             <li class="nav-item">
               <router-link class="nav-link" to="/register">Register</router-link>
@@ -37,14 +35,17 @@
             </li>
           </template>
           <template v-else>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/profile">Mon profil</router-link>
+            <!-- Icône et nom d'utilisateur (visibles uniquement sur desktop) -->
+            <li class="nav-item d-none d-lg-flex align-items-center me-3">
+              <div class="user-icon" @click="showIconSelector = true">
+                <img v-if="userIcon && userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" alt="User icon" />
+                <i v-else :class="userIcon"></i>
+              </div>
+              <span class="text-light ms-2">{{ username }}</span>
             </li>
+            <!-- Bouton de déconnexion -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/activity">Mes activités</router-link>
-            </li>
-            <li class="nav-item">
-              <a @click.prevent="logout" class="nav-link" href="#">Logout</a>
+              <a @click.prevent="handleLogout" class="nav-link" href="#">Logout</a>
             </li>
           </template>
         </ul>
@@ -179,5 +180,21 @@ export default {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Ajoutez ces styles pour ajuster l'apparence si nécessaire */
+.navbar-nav .nav-item {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 991px) {
+  .navbar-nav {
+    flex-direction: column;
+  }
+  
+  .nav-item {
+    margin-bottom: 10px;
+  }
 }
 </style>
