@@ -1,5 +1,5 @@
 <template>
-  <footer class="custom-footer py-3 fixed-bottom">
+  <footer class="custom-footer py-3 fixed-bottom" :class="{ 'footer-hidden': isHidden }">
     <div class="container">
       <div class="row">
         <div class="col-12 text-center">
@@ -14,7 +14,8 @@
 
 <script>
 export default {
-  name: 'AppFooter'
+  name: 'AppFooter',
+  props: ['isHidden']
 };
 </script>
 
@@ -23,6 +24,11 @@ export default {
   background-color: #BD1E1E;
   color: white;
   border-top: 2px solid white;
+  transition: transform 0.3s ease;
+}
+
+.footer-hidden {
+  transform: translateY(100%);
 }
 
 /* Ajoutez d'autres styles si nécessaire */

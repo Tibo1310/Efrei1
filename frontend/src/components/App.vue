@@ -1,12 +1,12 @@
 <template>
   <div id="app" class="d-flex flex-column min-vh-100">
     <AppHeader ref="header" />
-    <main class="flex-grow-1">
+    <main class="flex-grow-1 content-wrapper">
       <div class="container mt-4 mb-4">
         <router-view></router-view>
       </div>
     </main>
-    <AppFooter />
+    <AppFooter :isHidden="isFooterHidden" />
   </div>
 </template>
 
@@ -20,15 +20,37 @@ export default {
     AppHeader,
     AppFooter
   },
+  data() {
+    return {
+      isFooterHidden: false,
+      lastScrollPosition: 0
+    }
+  },
   mounted() {
     eventBus.on('login', () => {
       if (this.$refs.header) {
         this.$refs.header.checkLoginStatus();
       }
     });
+    window.addEventListener('scroll', this.onScroll);
   },
   beforeUnmount() {
     eventBus.off('login');
+    window.removeEventListener('scroll', this.onScroll);
+  },
+  methods: {
+    onScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScrollPosition < 0) {
+        return;
+      }
+      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
+        return;
+      }
+      // Inversons la logique ici
+      this.isFooterHidden = currentScrollPosition > this.lastScrollPosition;
+      this.lastScrollPosition = currentScrollPosition;
+    }
   }
 };
 </script>
@@ -49,14 +71,14 @@ main {
 }
 
 body {
-  padding-top: 30px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
+  padding-top: 76px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
 }
 
 .content-wrapper {
-  transition: margin-top 0.3s ease;
+  transition: margin-bottom 0.3s ease;
 }
 
-.navbar-hidden + .content-wrapper {
-  margin-top: 0;
+.footer-hidden + .content-wrapper {
+  margin-bottom: 0;
 }
 </style>
