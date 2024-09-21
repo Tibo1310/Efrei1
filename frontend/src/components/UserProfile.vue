@@ -1,82 +1,85 @@
 <template>
-  <div class="container mt-5">
-    <div v-if="isLoading">Chargement...</div>
-    <div v-else-if="!user">
-      <p class="text-center">Veuillez vous connecter pour voir votre profil.</p>
+  <div class="profile-container">
+    <div v-if="isLoading" class="text-center">Chargement...</div>
+    <div v-else-if="!user" class="text-center">
+      <p>Veuillez vous connecter pour voir votre profil.</p>
     </div>
-    <div v-else class="border p-4 rounded shadow-sm bg-light">
-      <div class="mb-3">
-        <strong>Username:</strong>
-        <span v-if="!isEditing">{{ user.username }}</span>
-        <input v-else type="text" v-model="editedUser.username" class="form-control">
-      </div>
-      <div class="mb-3">
-        <strong>Email:</strong>
-        <span v-if="!isEditing">{{ user.email }}</span>
-        <input v-else type="email" v-model="editedUser.email" class="form-control">
-      </div>
-      <div class="mb-3">
-        <strong>Nationality:</strong>
-        <span v-if="!isEditing">{{ user.nationality }}</span>
-        <select v-else v-model="editedUser.nationality" class="form-select">
-          <option v-for="country in countries" :key="country.code" :value="country.code">
-            {{ country.flag }} {{ country.name }}
-          </option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <strong>Known Languages:</strong>
-        <ul v-if="!isEditing">
-          <li v-for="lang in user.knownLanguages" :key="lang.language">
-            {{ lang.language }} - {{ lang.level }}
-          </li>
-        </ul>
-        <div v-else>
-          <div v-for="(lang, index) in editedUser.knownLanguages" :key="index" class="mb-2">
-            <select v-model="lang.language" class="form-select me-2 d-inline-block w-auto">
-              <option value="">Select a language</option>
-              <option v-for="language in getAvailableKnownLanguages(index)" :key="language" :value="language">
-                {{ language }}
-              </option>
-            </select>
-            <select v-model="lang.level" class="form-select me-2 d-inline-block w-auto">
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-              <option value="fluent">Fluent</option>
-            </select>
-            <button @click="removeKnownLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
-          </div>
-          <button @click="addKnownLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddKnownLanguage">Add Known Language</button>
+    <div v-else class="profile-content">
+      <h2 class="mb-4">Profil de {{ user.username }}</h2>
+      <div class="profile-form">
+        <div class="mb-3">
+          <strong>Username:</strong>
+          <span v-if="!isEditing">{{ user.username }}</span>
+          <input v-else type="text" v-model="editedUser.username" class="form-control">
         </div>
-      </div>
-      <div class="mb-3">
-        <strong>Learning Languages:</strong>
-        <ul v-if="!isEditing">
-          <li v-for="lang in user.learningLanguages" :key="lang">
-            {{ lang }}
-          </li>
-        </ul>
-        <div v-else>
-          <div v-for="(lang, index) in editedUser.learningLanguages" :key="index" class="mb-2">
-            <select v-model="editedUser.learningLanguages[index]" class="form-select me-2 d-inline-block w-auto">
-              <option value="">Select a language</option>
-              <option v-for="language in getAvailableLearningLanguages(index)" :key="language" :value="language">
-                {{ language }}
-              </option>
-            </select>
-            <button @click="removeLearningLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
-          </div>
-          <button @click="addLearningLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddLearningLanguage">Add Learning Language</button>
+        <div class="mb-3">
+          <strong>Email:</strong>
+          <span v-if="!isEditing">{{ user.email }}</span>
+          <input v-else type="email" v-model="editedUser.email" class="form-control">
         </div>
+        <div class="mb-3">
+          <strong>Nationality:</strong>
+          <span v-if="!isEditing">{{ user.nationality }}</span>
+          <select v-else v-model="editedUser.nationality" class="form-select">
+            <option v-for="country in countries" :key="country.code" :value="country.code">
+              {{ country.flag }} {{ country.name }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <strong>Known Languages:</strong>
+          <ul v-if="!isEditing">
+            <li v-for="lang in user.knownLanguages" :key="lang.language">
+              {{ lang.language }} - {{ lang.level }}
+            </li>
+          </ul>
+          <div v-else>
+            <div v-for="(lang, index) in editedUser.knownLanguages" :key="index" class="mb-2">
+              <select v-model="lang.language" class="form-select me-2 d-inline-block w-auto">
+                <option value="">Select a language</option>
+                <option v-for="language in getAvailableKnownLanguages(index)" :key="language" :value="language">
+                  {{ language }}
+                </option>
+              </select>
+              <select v-model="lang.level" class="form-select me-2 d-inline-block w-auto">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="fluent">Fluent</option>
+              </select>
+              <button @click="removeKnownLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
+            </div>
+            <button @click="addKnownLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddKnownLanguage">Add Known Language</button>
+          </div>
+        </div>
+        <div class="mb-3">
+          <strong>Learning Languages:</strong>
+          <ul v-if="!isEditing">
+            <li v-for="lang in user.learningLanguages" :key="lang">
+              {{ lang }}
+            </li>
+          </ul>
+          <div v-else>
+            <div v-for="(lang, index) in editedUser.learningLanguages" :key="index" class="mb-2">
+              <select v-model="editedUser.learningLanguages[index]" class="form-select me-2 d-inline-block w-auto">
+                <option value="">Select a language</option>
+                <option v-for="language in getAvailableLearningLanguages(index)" :key="language" :value="language">
+                  {{ language }}
+                </option>
+              </select>
+              <button @click="removeLearningLanguage(index)" class="btn btn-danger btn-sm">Remove</button>
+            </div>
+            <button @click="addLearningLanguage" class="btn btn-secondary btn-sm mt-2" :disabled="!canAddLearningLanguage">Add Learning Language</button>
+          </div>
+        </div>
+        <div class="mb-3" v-if="isEditing">
+          <strong>Password:</strong>
+          <input type="password" v-model="editedUser.password" class="form-control" placeholder="Enter new password">
+        </div>
+        <button v-if="!isEditing" @click="startEditing" class="btn btn-dark">Modifier</button>
+        <button v-else @click="saveChanges" class="btn btn-dark">Valider</button>
+        <div v-if="errorMessage" class="text-danger mt-2">{{ errorMessage }}</div>
       </div>
-      <div class="mb-3">
-        <strong>Password:</strong>
-        <input v-if="isEditing" type="password" v-model="editedUser.password" class="form-control" placeholder="Enter new password">
-      </div>
-      <button v-if="!isEditing" @click="startEditing" class="btn btn-primary">Modifier</button>
-      <button v-else @click="saveChanges" class="btn btn-success">Valider</button>
-      <div v-if="errorMessage" class="text-danger mt-2">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
@@ -224,3 +227,58 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.profile-container {
+  padding-top: 30px; /* Adjust this value based on your navbar height */
+  padding-bottom: 60px;
+}
+
+.profile-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 2px solid black; /* Added black border */
+}
+
+h2 {
+  color: #333;
+  border-bottom: 2px solid #333;
+  padding-bottom: 10px;
+}
+
+.profile-form {
+  margin-top: 20px;
+}
+
+.form-control, .form-select {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.btn {
+  border: none;
+}
+
+.btn-dark {
+  background-color: black;
+  color: white;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+@media (max-width: 768px) {
+  .profile-content {
+    padding: 20px;
+  }
+}
+</style>
