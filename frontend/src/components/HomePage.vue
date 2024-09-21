@@ -15,7 +15,7 @@
                 <div class="followers">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
               </div>
             </div>
-            <button v-if="post.author && post.author._id !== user.userId" 
+            <button v-if="isLoggedIn && post.author && user && post.author._id !== user.userId" 
                     @click="followUser(post.author._id)" 
                     class="btn btn-sm" 
                     :class="isFollowing(post.author._id) ? 'btn-secondary' : 'btn-primary'">
@@ -194,7 +194,7 @@ export default {
     },
     
     async followUser(authorId) {
-      if (this.user && this.user.userId) {
+      if (this.isLoggedIn && this.user && this.user.userId) {
         try {
           await this.$store.dispatch('followUser', authorId);
           // Mettez à jour les posts ou l'utilisateur après le suivi
