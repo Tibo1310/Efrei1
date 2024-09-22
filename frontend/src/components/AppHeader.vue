@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top" :class="{ 'navbar-hidden': isHidden }">
     <div class="container">
       <!-- Logo et nom de l'application -->
-      <router-link class="navbar-brand d-flex align-items-center" to="/">
+      <router-link class="navbar-brand d-flex align-items-center" to="/" @click="closeNavbar">
         <img src="/logo.png" alt="Logo" class="me-2" style="height: 30px;">
         Spella
       </router-link>
@@ -15,12 +15,12 @@
       <!-- Contenu de la barre de navigation -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">
-          <!-- Liens du milieu (visibles uniquement sur desktop et pour les utilisateurs connectés) -->
-          <li class="nav-item d-none d-lg-block" v-if="isLoggedIn">
-            <router-link class="nav-link" to="/profile">Mon profil</router-link>
+          <!-- Liens du milieu (visibles sur desktop et mobile pour les utilisateurs connectés) -->
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link class="nav-link" to="/profile" @click="closeNavbar">Mon profil</router-link>
           </li>
-          <li class="nav-item d-none d-lg-block" v-if="isLoggedIn">
-            <router-link class="nav-link" to="/activity">Mes activités</router-link>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link class="nav-link" to="/activity" @click="closeNavbar">Mes activités</router-link>
           </li>
         </ul>
 
@@ -28,10 +28,10 @@
         <ul class="navbar-nav ms-auto">
           <template v-if="!isLoggedIn">
             <li class="nav-item">
-              <router-link class="nav-link" to="/register">Register</router-link>
+              <router-link class="nav-link" to="/register" @click="closeNavbar">Register</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/login">Login</router-link>
+              <router-link class="nav-link" to="/login" @click="closeNavbar">Login</router-link>
             </li>
           </template>
           <template v-else>
@@ -86,6 +86,7 @@ export default {
     handleLogout() {
       this.logout();
       this.$router.push('/login');
+      this.closeNavbar();
     },
     async selectIcon(icon) {
       try {
@@ -106,6 +107,13 @@ export default {
       }
       this.isHidden = currentScrollPosition > this.lastScrollPosition;
       this.lastScrollPosition = currentScrollPosition;
+    },
+    closeNavbar() {
+      const navbarToggler = document.querySelector('.navbar-toggler');
+      const navbarCollapse = document.querySelector('.navbar-collapse');
+      if (navbarCollapse.classList.contains('show')) {
+        navbarToggler.click();
+      }
     }
   }
 };
