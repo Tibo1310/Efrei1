@@ -1,9 +1,9 @@
 <template>
   <div class="container mt-5">
     <div class="btn-group w-100 mb-4" role="group">
-      <button @click="currentTab = 'like'" :class="['btn', currentTab === 'like' ? 'btn-primary' : 'btn-outline-primary']">Likes</button>
-      <button @click="currentTab = 'comment'" :class="['btn', currentTab === 'comment' ? 'btn-primary' : 'btn-outline-primary']">Commentaires</button>
-      <button @click="currentTab = 'share'" :class="['btn', currentTab === 'share' ? 'btn-primary' : 'btn-outline-primary']">Partages</button>
+      <button @click="currentTab = 'like'" :class="['btn', currentTab === 'like' ? 'btn-dark' : 'btn-outline-dark']">Likes</button>
+      <button @click="currentTab = 'comment'" :class="['btn', currentTab === 'comment' ? 'btn-dark' : 'btn-outline-dark']">Commentaires</button>
+      <button @click="currentTab = 'share'" :class="['btn', currentTab === 'share' ? 'btn-dark' : 'btn-outline-dark']">Partages</button>
     </div>
     <div v-if="isLoading">Chargement des activités...</div>
     <div v-else-if="!userActivities || userActivities.length === 0" class="text-center">
@@ -34,23 +34,23 @@
             <div v-if="activity.postId.mediaUrl" class="card-img-wrapper mb-3">
               <img :src="`http://localhost:5000${activity.postId.mediaUrl}`" class="card-img rounded" alt="Post media">
             </div>
-            <div v-if="activity.type === 'comment'" class="mt-2">
+            <div v-if="currentTab === 'comment'" class="mt-2">
               <strong>Votre commentaire:</strong> {{ activity.comment }}
             </div>
           </div>
           <div class="card-footer bg-light d-flex justify-content-between align-items-center">
             <div class="post-date small text-muted">{{ formatDate(activity.postId.dateCreated) }}</div>
             <div class="card-actions d-flex">
-              <div class="action me-3">
-                <i class="fas fa-thumbs-up"></i>
+              <div v-if="currentTab === 'like'" class="action" @click="toggleLike(activity)">
+                <i class="fas fa-thumbs-up text-primary"></i>
                 <span class="ms-1">{{ activity.postId.likes ? activity.postId.likes.length : 0 }}</span>
               </div>
-              <div class="action me-3">
+              <div v-if="currentTab === 'comment'" class="action">
                 <i class="fas fa-comment"></i>
                 <span class="ms-1">{{ activity.postId.comments ? activity.postId.comments.length : 0 }}</span>
               </div>
-              <div class="action">
-                <i class="fas fa-share"></i>
+              <div v-if="currentTab === 'share'" class="action" @click="toggleShare(activity)">
+                <i class="fas fa-share text-primary"></i>
                 <span class="ms-1">{{ activity.postId.shares || 0 }}</span>
               </div>
             </div>
@@ -79,7 +79,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchUserActivities']),
+    ...mapActions(['fetchUserActivities', 'likePost', 'sharePost']),
     formatDate(date) {
       return new Date(date).toLocaleDateString();
     },
@@ -96,6 +96,38 @@ export default {
           return 'Shared';
         default:
           return 'Interacted with';
+      }
+    },
+    async toggleLike(activity) {
+      try {
+        const result = await this.likePost(activity.postId._id);
+        if (result.success) {
+          if (!result.likes.includes(this.user.userId)) {
+            // Si l'utilisateur n'aime plus le post, le supprimer de la liste
+            this.userActivities = this.userActivities.filter(a => a._id !== activity._id);
+          } else {
+            // Mettre à jour le nombre de likes
+            activity.postId.likes = result.likes;
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling like:', error);
+      }
+    },
+    async toggleShare(activity) {
+      try {
+        const result = await this.sharePost(activity.postId._id);
+        if (result.success) {
+          if (result.action === 'unshared') {
+            // Si l'utilisateur ne partage plus le post, le supprimer de la liste
+            this.userActivities = this.userActivities.filter(a => a._id !== activity._id);
+          } else {
+            // Mettre à jour le nombre de partages
+            activity.postId.shares = result.shares;
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling share:', error);
       }
     }
   },
@@ -209,25 +241,25 @@ export default {
 }
 
 .btn-group .btn {
-  border-color: #007bff;
+  border-color: #000;
 }
 
 .btn-group .btn:not(:last-child) {
   border-right: none;
 }
 
-.btn-group .btn.btn-primary {
-  background-color: #007bff;
+.btn-group .btn.btn-dark {
+  background-color: #000;
   color: white;
 }
 
-.btn-group .btn.btn-outline-primary {
-  color: #007bff;
+.btn-group .btn.btn-outline-dark {
+  color: #000;
   background-color: white;
 }
 
-.btn-group .btn.btn-outline-primary:hover {
-  background-color: #007bff;
+.btn-group .btn.btn-outline-dark:hover {
+  background-color: #000;
   color: white;
 }
 </style>
