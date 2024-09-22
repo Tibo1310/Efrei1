@@ -4,6 +4,8 @@
       <button @click="currentTab = 'like'" :class="['btn', currentTab === 'like' ? 'btn-dark' : 'btn-outline-dark']">Likes</button>
       <button @click="currentTab = 'comment'" :class="['btn', currentTab === 'comment' ? 'btn-dark' : 'btn-outline-dark']">Commentaires</button>
       <button @click="currentTab = 'share'" :class="['btn', currentTab === 'share' ? 'btn-dark' : 'btn-outline-dark']">Partages</button>
+      <button @click="currentTab = 'followers'" :class="['btn', currentTab === 'followers' ? 'btn-dark' : 'btn-outline-dark']">Abonnés</button>
+      <button @click="currentTab = 'following'" :class="['btn', currentTab === 'following' ? 'btn-dark' : 'btn-outline-dark']">Abonnements</button>
     </div>
     <div v-if="isLoading">Chargement des activités...</div>
     <div v-else-if="!userActivities || userActivities.length === 0" class="text-center">
@@ -80,7 +82,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchUserActivities', 'likePost', 'sharePost']),
+    ...mapActions(['fetchUserActivities', 'likePost', 'sharePost', 'fetchUserProfile']),
     formatDate(date) {
       return new Date(date).toLocaleDateString();
     },
@@ -126,9 +128,10 @@ export default {
     if (this.user && this.user.userId) {
       try {
         await this.fetchUserActivities();
+        await this.fetchUserProfile(); // Fetch the user profile to get followers and following
         this.localActivities = [...this.userActivities];
       } catch (error) {
-        console.error('Error fetching user activities:', error);
+        console.error('Error fetching user data:', error);
       } finally {
         this.isLoading = false;
       }
@@ -261,5 +264,28 @@ export default {
 .btn-group .btn.btn-outline-dark:hover {
   background-color: #000;
   color: white;
+}
+
+.user-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.btn-group .btn {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .btn-group {
+    flex-wrap: wrap;
+  }
+  .btn-group .btn {
+    flex-basis: 33.33%;
+  }
 }
 </style>
