@@ -14,31 +14,45 @@
     </div>
     <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="activity in filteredActivities" :key="activity._id" class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card h-100 shadow-sm border-dark">
           <div class="activity-banner" :class="activity.type">
             {{ getActivityText(activity) }} on {{ formatDate(activity.date) }} at {{ formatTime(activity.date) }}
           </div>
-          <div class="card-header d-flex align-items-center">
-            <img v-if="activity.postId.author && activity.postId.author.icon && activity.postId.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${activity.postId.author.icon}`" class="user-icon me-2" />
-            <i v-else :class="[activity.postId.author ? activity.postId.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
-            <div>
-              <div class="username">{{ activity.postId.author ? activity.postId.author.username : 'Unknown' }}</div>
-              <div class="followers">{{ activity.postId.author ? activity.postId.author.followers || 0 : 0 }} abonnés</div>
-              <div class="post-date">{{ formatDate(activity.postId.dateCreated) }}</div>
+          <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img v-if="activity.postId.author && activity.postId.author.icon && activity.postId.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${activity.postId.author.icon}`" class="user-icon me-2" />
+              <i v-else :class="[activity.postId.author ? activity.postId.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
+              <div>
+                <div class="username">{{ activity.postId.author ? activity.postId.author.username : 'Unknown' }}</div>
+                <div class="followers small">{{ activity.postId.author ? activity.postId.author.followers || 0 : 0 }} abonnés</div>
+              </div>
             </div>
           </div>
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ activity.postId.name }}</h5>
             <p class="card-text flex-grow-1">{{ activity.postId.description }}</p>
-            <div v-if="activity.postId.mediaUrl" class="card-img-wrapper">
-              <img :src="`http://localhost:5000${activity.postId.mediaUrl}`" class="card-img" alt="Post media">
-            </div>
-            <div class="card-footer d-flex justify-content-between">
-              <span>{{ activity.postId.comments ? activity.postId.comments.length : 0 }} commentaires</span>
-              <span>{{ activity.postId.likes ? activity.postId.likes.length : 0 }} likes</span>
+            <div v-if="activity.postId.mediaUrl" class="card-img-wrapper mb-3">
+              <img :src="`http://localhost:5000${activity.postId.mediaUrl}`" class="card-img rounded" alt="Post media">
             </div>
             <div v-if="activity.type === 'comment'" class="mt-2">
               <strong>Votre commentaire:</strong> {{ activity.comment }}
+            </div>
+          </div>
+          <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <div class="post-date small text-muted">{{ formatDate(activity.postId.dateCreated) }}</div>
+            <div class="card-actions d-flex">
+              <div class="action me-3">
+                <i class="fas fa-thumbs-up"></i>
+                <span class="ms-1">{{ activity.postId.likes ? activity.postId.likes.length : 0 }}</span>
+              </div>
+              <div class="action me-3">
+                <i class="fas fa-comment"></i>
+                <span class="ms-1">{{ activity.postId.comments ? activity.postId.comments.length : 0 }}</span>
+              </div>
+              <div class="action">
+                <i class="fas fa-share"></i>
+                <span class="ms-1">{{ activity.postId.shares || 0 }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -61,10 +75,7 @@ export default {
   computed: {
     ...mapState(['userActivities', 'user']),
     filteredActivities() {
-      console.log('All activities:', this.userActivities);
-      const filtered = this.userActivities.filter(activity => activity.type === this.currentTab);
-      console.log('Filtered activities:', filtered);
-      return filtered;
+      return this.userActivities.filter(activity => activity.type === this.currentTab);
     }
   },
   methods: {
@@ -81,8 +92,6 @@ export default {
           return 'Liked';
         case 'comment':
           return 'Commented';
-        case 'repost':
-          return 'Reposted';
         case 'share':
           return 'Shared';
         default:
@@ -91,12 +100,9 @@ export default {
     }
   },
   async created() {
-    console.log('UserActivity component created');
     if (this.user && this.user.userId) {
       try {
-        console.log('Fetching activities for user:', this.user.userId);
         await this.fetchUserActivities();
-        console.log('Activities after fetch:', this.userActivities);
       } catch (error) {
         console.error('Error fetching user activities:', error);
       } finally {
@@ -105,14 +111,6 @@ export default {
     } else {
       console.error('User not logged in');
       this.isLoading = false;
-    }
-  },
-  watch: {
-    userActivities: {
-      handler(newActivities) {
-        console.log('userActivities updated:', newActivities);
-      },
-      deep: true
     }
   }
 };
@@ -136,18 +134,22 @@ export default {
   color: #212529;
 }
 
-.activity-banner.repost {
+.activity-banner.share {
   background-color: #17a2b8;
 }
 
-.activity-banner.share {
-  background-color: #6c757d;
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-width: 2px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 10px;
+  border-bottom: none;
 }
 
 .user-icon {
@@ -166,25 +168,66 @@ export default {
   font-weight: bold;
 }
 
-.followers, .post-date {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
 .card-img-wrapper {
-  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .card-img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.card-img:hover {
+  transform: scale(1.05);
 }
 
 .card-footer {
+  border-top: 1px solid rgba(0,0,0,0.125);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.action:hover {
+  color: #007bff;
+}
+
+.action i {
+  font-size: 1.1rem;
+}
+
+.action span {
   font-size: 0.9rem;
-  color: #6c757d;
-  border-top: 1px solid #e9ecef;
-  padding-top: 10px;
+}
+
+.btn-group {
+  margin-bottom: 20px;
+}
+
+.btn-group .btn {
+  border-color: #007bff;
+}
+
+.btn-group .btn:not(:last-child) {
+  border-right: none;
+}
+
+.btn-group .btn.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-group .btn.btn-outline-primary {
+  color: #007bff;
+  background-color: white;
+}
+
+.btn-group .btn.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
 }
 </style>

@@ -5,44 +5,43 @@
     </div>
     <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="post in posts" :key="post._id" class="col">
-        <div class="card h-100 shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card h-100 shadow-sm border-dark">
+          <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
               <img v-if="post.author && post.author.icon && post.author.icon.startsWith('/uploads/')" :src="`http://localhost:5000${post.author.icon}`" class="user-icon me-2" />
               <i v-else :class="[post.author ? post.author.icon : 'fas fa-user-circle', 'user-icon', 'me-2', 'basic-icon']"></i>
               <div>
                 <div class="username">{{ post.author ? post.author.username : 'Unknown' }}</div>
-                <div class="followers">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
+                <div class="followers small">{{ post.author ? post.author.followers || 0 : 0 }} abonnés</div>
               </div>
             </div>
             <button v-if="isLoggedIn && post.author && user && post.author._id !== user.userId" 
                     @click="followUser(post.author._id)" 
-                    class="btn btn-sm" 
-                    :class="isFollowing(post.author._id) ? 'btn-secondary' : 'btn-primary'">
+                    class="btn btn-sm btn-outline-light">
               {{ isFollowing(post.author._id) ? 'Unfollow' : 'Follow' }}
             </button>
           </div>
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ post.name }}</h5>
             <p class="card-text flex-grow-1">{{ post.description }}</p>
-            <div v-if="post.mediaUrl" class="card-img-wrapper">
-              <img :src="`http://localhost:5000${post.mediaUrl}`" class="card-img" alt="Post media">
+            <div v-if="post.mediaUrl" class="card-img-wrapper mb-3">
+              <img :src="`http://localhost:5000${post.mediaUrl}`" class="card-img rounded" alt="Post media">
             </div>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div class="post-date">{{ new Date(post.dateCreated).toLocaleDateString() }}</div>
+          <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <div class="post-date small text-muted">{{ new Date(post.dateCreated).toLocaleDateString() }}</div>
             <div class="card-actions d-flex">
               <div class="action me-3" @click="likePost(post)">
                 <i :class="['fas', 'fa-thumbs-up', { 'text-primary': isLikedByUser(post) }]"></i>
-                <span>{{ post.likes ? post.likes.length : 0 }}</span>
+                <span class="ms-1">{{ post.likes ? post.likes.length : 0 }}</span>
               </div>
               <div class="action me-3" @click="showCommentModalForPost(post)">
                 <i class="fas fa-comment"></i>
-                <span>{{ post.comments ? post.comments.length : 0 }}</span>
+                <span class="ms-1">{{ post.comments ? post.comments.length : 0 }}</span>
               </div>
               <div class="action" @click="sharePost(post)">
                 <i :class="['fas', 'fa-share', { 'text-primary': isSharedByUser(post) }]"></i>
-                <span>{{ post.shares || 0 }}</span>
+                <span class="ms-1">{{ post.shares || 0 }}</span>
               </div>
             </div>
           </div>
@@ -228,10 +227,18 @@ export default {
 </script>
 
 <style scoped>
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-width: 2px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 10px;
+  border-bottom: none;
 }
 
 .user-icon {
@@ -242,54 +249,44 @@ export default {
 }
 
 .basic-icon {
-  font-size: 40px; /* Adjust the size to match the custom icons */
-  line-height: 40px; /* Center the icon vertically */
+  font-size: 40px;
+  line-height: 40px;
 }
 
 .username {
   font-weight: bold;
 }
 
-.followers, .post-date {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
 .card-img-wrapper {
-  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .card-img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.card-img:hover {
+  transform: scale(1.05);
 }
 
 .card-footer {
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  padding: 10px;
-}
-
-.post-date {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.card-actions {
-  display: flex;
-  justify-content: flex-end;
+  border-top: 1px solid rgba(0,0,0,0.125);
 }
 
 .action {
   display: flex;
   align-items: center;
   cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.action:hover {
+  color: #007bff;
 }
 
 .action i {
-  font-size: 1.2rem;
-  margin-right: 5px;
+  font-size: 1.1rem;
 }
 
 .action span {
