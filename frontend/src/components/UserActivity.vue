@@ -69,13 +69,14 @@ export default {
   data() {
     return {
       currentTab: 'like',
-      isLoading: true
+      isLoading: true,
+      localActivities: []
     };
   },
   computed: {
     ...mapState(['userActivities', 'user']),
     filteredActivities() {
-      return this.userActivities.filter(activity => activity.type === this.currentTab);
+      return this.localActivities.filter(activity => activity.type === this.currentTab);
     }
   },
   methods: {
@@ -102,13 +103,8 @@ export default {
       try {
         const result = await this.likePost(activity.postId._id);
         if (result.success) {
-          if (!result.likes.includes(this.user.userId)) {
-            // Si l'utilisateur n'aime plus le post, le supprimer de la liste
-            this.userActivities = this.userActivities.filter(a => a._id !== activity._id);
-          } else {
-            // Mettre à jour le nombre de likes
-            activity.postId.likes = result.likes;
-          }
+          // Supprimer l'activité de la liste locale
+          this.localActivities = this.localActivities.filter(a => a._id !== activity._id);
         }
       } catch (error) {
         console.error('Error toggling like:', error);
@@ -118,13 +114,8 @@ export default {
       try {
         const result = await this.sharePost(activity.postId._id);
         if (result.success) {
-          if (result.action === 'unshared') {
-            // Si l'utilisateur ne partage plus le post, le supprimer de la liste
-            this.userActivities = this.userActivities.filter(a => a._id !== activity._id);
-          } else {
-            // Mettre à jour le nombre de partages
-            activity.postId.shares = result.shares;
-          }
+          // Supprimer l'activité de la liste locale
+          this.localActivities = this.localActivities.filter(a => a._id !== activity._id);
         }
       } catch (error) {
         console.error('Error toggling share:', error);
@@ -135,6 +126,7 @@ export default {
     if (this.user && this.user.userId) {
       try {
         await this.fetchUserActivities();
+        this.localActivities = [...this.userActivities];
       } catch (error) {
         console.error('Error fetching user activities:', error);
       } finally {
@@ -143,6 +135,14 @@ export default {
     } else {
       console.error('User not logged in');
       this.isLoading = false;
+    }
+  },
+  watch: {
+    userActivities: {
+      handler(newActivities) {
+        this.localActivities = [...newActivities];
+      },
+      deep: true
     }
   }
 };
