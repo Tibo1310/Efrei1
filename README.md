@@ -44,18 +44,18 @@ Description : Spella est une application web type "Twitter" qui a pour but de pe
 
 ## Techno utilisées :
 
-Vue.js : front => interfaces utilisateur.
-Vue Router : routeur
-Vuex : gestionnaire d'état
-Bootstrap : framework front
-Font Awesome : icônes vectorielles
-Node.js : backend => environnement d'exécution JS
-Express : framework web Node.js
-Mongoose : ODM MongoDB / Node.js.
-MongoDB : BDD NoSQL
-JWT : authentification / gestion sessions utilisateur.
-Multer : middleware pour téléchargements de fichiers (ici custom icons)
-Bcrypt.js : hacher les mots de passe avant de les stocker dans la bdd
-Cypress : tests end-to-end.
-Jest : tests unitaires.
-GitHub Actions : intégration continue / déploiement continu CI/CD
+Vue.js : front => interfaces utilisateur.  
+Vue Router : routeur.  
+Vuex : gestionnaire d'état.  
+Bootstrap : framework front.  
+Font Awesome : icônes vectorielles.  
+Node.js : backend => environnement d'exécution JS.  
+Express : framework web Node.js.  
+Mongoose : ODM MongoDB / Node.js.  
+MongoDB : BDD NoSQL.  
+JWT : authentification / gestion sessions utilisateur.  
+Multer : middleware pour téléchargements de fichiers (ici custom icons).  
+Bcrypt.js : hacher les mots de passe avant de les stocker dans la bdd.  
+Cypress : tests end-to-end.  
+Jest : tests unitaires.  
+GitHub Actions : intégration continue / déploiement continu CI/CD.  
