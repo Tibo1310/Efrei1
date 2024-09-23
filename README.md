@@ -29,6 +29,12 @@ npm install
 ```
 npm run build
 ```
+### DOCKER (bien lancer Docker Desktop et ça fonctionne parfaitement)
+```
+Permet de ne pas avoir à écrire node server.js et npm run serve :
+docker-compose build
+docker-compose up
+```
 
 ### FRONTEND (bien se mettre sur le dossier frontend)
 ```
@@ -40,11 +46,7 @@ npm run serve
 node server.js
 ```
 
-### DOCKER (bien lancer Docker Desktop et ça fonctionne parfaitement)
-```
-docker-compose build
-docker-compose up
-```
+
 
 
 ### Lints and fixes files
