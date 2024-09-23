@@ -21,8 +21,6 @@ Cypress : tests end-to-end.
 Jest : tests unitaires.  
 GitHub Actions : intégration continue / déploiement continu CI/CD.  
 
-# frontend
-
 ## Project setup
 ```
 npm install
