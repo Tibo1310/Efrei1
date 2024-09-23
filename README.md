@@ -52,6 +52,7 @@ npm test
 ```
 npm run test:unit (pas implémenté encore)
 ```
+```
 npm run test:e2e (pas implémenté encore)
 ```
 ### Lints and fixes files
@@ -72,3 +73,9 @@ Pour voir tous les items : http://localhost:5000/items
 Database : MongoDB Compass > localhost:27017/EFREI_Projet 
 - Collections : users, items, posts, activities
 
+##
+Fonctionnalités restantes à implémenter :
+- suivre un utilisateur
+- voir ses follwers/following
+- suprimer ses posts / edit ses posts
+- tests e2e / unitaires front
