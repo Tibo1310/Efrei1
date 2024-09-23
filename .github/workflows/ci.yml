@@ -10,23 +10,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js
+
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16'
+
     - name: Install dependencies
       run: |
         cd frontend
-        npm ci
-        cd ../backend
-        npm ci
-    - name: Run frontend tests
+        npm install
+        cd ..
+        npm install
+
+    - name: Run backend tests
+      run: npm test
+
+    - name: Run frontend unit tests
       run: |
         cd frontend
-        npm test
-    - name: Run backend tests
+        npm run test:unit
+
+    - name: Run Cypress tests
       run: |
-        cd backend
-        npm test
+        cd frontend
+        npm run test:e2e
+      env:
+        CYPRESS_baseUrl: http://localhost:8080

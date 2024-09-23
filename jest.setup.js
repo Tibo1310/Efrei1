@@ -11,3 +11,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await mongod.stop();
 });
+
+global.fetch = require('jest-fetch-mock');
+global.alert = jest.fn();
