@@ -35,7 +35,7 @@ Lancer serveur node: node server.js
 Pour voir tous les items : http://localhost:5000/items
 
 Database : MongoDB Compass > localhost:27017/EFREI_Projet 
-- Collections : users, items, posts.
+- Collections : users, items, posts, activities
 
 ## Nom du projet : Spella
 
