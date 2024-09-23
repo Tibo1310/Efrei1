@@ -1,7 +1,7 @@
 ## Nom du projet : Spella
 
 ##
-Description : Spella est une application web type "Twitter" qui a pour but de permettre aux utilisateurs de partager des tutoriels interactifs et conseils pour apprendre une nouvelle langue, pour tous les niveaux.
+Description : Spella est une application web type "Twitter" qui a pour but de permettre aux utilisateurs de partager des tutoriels interactifs et conseils sous forme de posts pour apprendre une nouvelle langue, pour tous les niveaux.
 
 ## Techno utilisées :
 
