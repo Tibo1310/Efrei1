@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema({
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
-// Hash password before saving
+// Hash password avant de save
 UserSchema.pre('save', async function(next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);

@@ -128,7 +128,7 @@ export default {
     if (this.user && this.user.userId) {
       try {
         await this.fetchUserActivities();
-        await this.fetchUserProfile(); // Fetch the user profile to get followers and following
+        await this.fetchUserProfile(); // get abonnés et abonnements
         this.localActivities = [...this.userActivities];
       } catch (error) {
         console.error('Error fetching user data:', error);

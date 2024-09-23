@@ -33,8 +33,8 @@ export default {
 
 <style>
 #app {
-  padding-top: 56px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
-  padding-bottom: 60px; /* Ajustez cette valeur en fonction de la hauteur de votre footer */
+  padding-top: 56px;
+  padding-bottom: 60px;
 }
 
 main {

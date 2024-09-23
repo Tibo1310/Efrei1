@@ -201,7 +201,6 @@ export default {
   object-fit: cover;
 }
 
-/* Ajoutez ces styles pour ajuster l'apparence si nécessaire */
 .navbar-nav .nav-item {
   display: flex;
   align-items: center;

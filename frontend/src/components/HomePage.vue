@@ -99,7 +99,7 @@ export default {
         if (!updatedPost.comments) {
           updatedPost.comments = [];
         }
-        // Vérifier si le commentaire n'existe pas déjà avant de l'ajouter
+        // Vérifier si commentaire existe déjà avant de l'ajouter
         if (!updatedPost.comments.some(c => c._id === newComment._id)) {
           updatedPost.comments.push(newComment);
           this.$store.commit('updatePost', { index: postIndex, post: updatedPost });
@@ -131,11 +131,11 @@ export default {
       }
     },
     isLikedByUser(post) {
-      // Vérifier si l'utilisateur est connecté et si le post a des likes
+      // Vérifier si utilisateur connecté et si le post a des likes
       if (this.user && this.user.userId && Array.isArray(post.likes)) {
         return post.likes.includes(this.user.userId);
       }
-      return false; // Retourner false si l'utilisateur n'est pas connecté ou si le post n'a pas de likes
+      return false; // false si l'utilisateur n'est pas connecté ou si le post n'a pas de likes
     },
     async repostPost(post) {
       if (post && post._id) {
@@ -187,8 +187,7 @@ export default {
       }
     },
     isFollowing(authorId) {
-      // Implémentez cette méthode pour vérifier si l'utilisateur suit déjà l'auteur
-      // Vous devrez probablement ajouter une propriété 'following' à l'objet user dans le store
+      // à implémenter plus tard
       return this.user && this.user.following && this.user.following.includes(authorId);
     },
     
@@ -196,7 +195,7 @@ export default {
       if (this.isLoggedIn && this.user && this.user.userId) {
         try {
           await this.$store.dispatch('followUser', authorId);
-          // Mettez à jour les posts ou l'utilisateur après le suivi
+          // update les posts ou l'utilisateur après le suivi
           await this.fetchPosts();
         } catch (error) {
           console.error('Error following user:', error);

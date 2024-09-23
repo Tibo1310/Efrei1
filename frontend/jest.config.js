@@ -1,5 +1,5 @@
 module.exports = {
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom',
   moduleFileExtensions: ['js', 'json', 'vue'],
   transform: {
     '^.+\\.vue$': '@vue/vue3-jest',

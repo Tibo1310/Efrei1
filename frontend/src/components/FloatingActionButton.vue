@@ -15,11 +15,11 @@ export default {
 <style scoped>
 .floating-action-button-container {
   position: fixed;
-  bottom: 80px; /* Augmenté pour être au-dessus du footer */
+  bottom: 80px;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center; /* Centré horizontalement */
+  justify-content: center;
   z-index: 1000;
 }
 
@@ -47,7 +47,6 @@ export default {
   transition: font-size 0.3s ease;
 }
 
-/* Media queries pour un dimensionnement responsive */
 @media (min-width: 768px) {
   .floating-action-button {
     width: 80px;

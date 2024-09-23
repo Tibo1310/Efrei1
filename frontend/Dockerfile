@@ -1,4 +1,3 @@
-# Utiliser une image officielle de Node.js comme image de base
 FROM node:16
 
 # Définir le répertoire de travail dans le conteneur
@@ -13,7 +12,7 @@ RUN npm install
 # Copier le reste des fichiers de l'application
 COPY . .
 
-# Exposer le port sur lequel l'application écoute
+# Port de l'app
 EXPOSE 8080
 
 # Démarrer l'application

@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import router from '../router'; // Assurez-vous d'importer le router
+import router from '../router';
 
 export default createStore({
   state: {
@@ -51,7 +51,7 @@ export default createStore({
         if (!post.comments) {
           post.comments = [];
         }
-        // Vérifier si le commentaire n'existe pas déjà avant de l'ajouter
+        // Vérifier si commentaire existe déjà avant de l'ajouter
         if (!post.comments.some(c => c._id === comment._id)) {
           post.comments.push(comment);
         }
@@ -82,7 +82,7 @@ export default createStore({
       localStorage.removeItem('userId')
       localStorage.removeItem('userIcon')
       commit('setLoginStatus', false)
-      router.push('/login') // Rediriger vers la page de connexion après la déconnexion
+      router.push('/login') // Rediriger vers page connexion après déconnexion
     },
     fetchPosts({ commit }) {
       fetch('http://localhost:5000/posts')
@@ -253,7 +253,6 @@ export default createStore({
           throw new Error('Failed to add comment');
         }
         const data = await response.json();
-        // Assurez-vous que l'icône de l'utilisateur est incluse dans le commentaire
         data.comment.user = { icon: userIcon };
         commit('addCommentToPost', { postId, comment: data.comment });
         return data.comment;

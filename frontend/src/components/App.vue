@@ -47,7 +47,6 @@ export default {
       if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
         return;
       }
-      // Inversons la logique ici
       this.isFooterHidden = currentScrollPosition > this.lastScrollPosition;
       this.lastScrollPosition = currentScrollPosition;
     }
@@ -67,11 +66,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 main {
-  padding-bottom: 70px; /* Increased padding to account for the fixed footer */
+  padding-bottom: 70px;
 }
 
 body {
-  padding-top: 30px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
+  padding-top: 30px;
 }
 
 .content-wrapper {

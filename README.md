@@ -49,9 +49,11 @@ node server.js
 ```
 npm test
 ```
-
-
-
+```
+npm run test:unit (pas implémenté encore)
+```
+npm run test:e2e (pas implémenté encore)
+```
 ### Lints and fixes files
 ```
 npm run lint

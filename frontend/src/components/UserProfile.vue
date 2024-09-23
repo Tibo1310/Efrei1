@@ -230,7 +230,7 @@ export default {
 
 <style scoped>
 .profile-container {
-  padding-top: 30px; /* Adjust this value based on your navbar height */
+  padding-top: 30px;
   padding-bottom: 60px;
 }
 
@@ -241,7 +241,7 @@ export default {
   padding: 30px;
   max-width: 800px;
   margin: 0 auto;
-  border: 2px solid black; /* Added black border */
+  border: 2px solid black;
 }
 
 h2 {

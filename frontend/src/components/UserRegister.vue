@@ -100,7 +100,6 @@ export default {
   methods: {
     ...mapActions(['register']),
     updateAvailableLanguages() {
-      // Cette méthode n'est plus nécessaire, mais nous la gardons pour la compatibilité
     },
     getAvailableKnownLanguages(currentIndex) {
       const usedLanguages = new Set(
