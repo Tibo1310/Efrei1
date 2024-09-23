@@ -45,7 +45,10 @@ npm run serve
 ```
 node server.js
 ```
-
+### TESTS UNITAIRES
+```
+npm test
+```
 
 
 
