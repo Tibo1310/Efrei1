@@ -35,7 +35,8 @@ Database : MongoDB Compass > localhost:27017/EFREI_Projet
 
 ## Nom du projet : Spella
 
-## Description : Spella est une application web type "Twitter" qui a pour but de permettre aux utilisateurs de partager des tutoriels interactifs et conseils pour apprendre une nouvelle langue, pour tous les niveaux.
+##
+Description : Spella est une application web type "Twitter" qui a pour but de permettre aux utilisateurs de partager des tutoriels interactifs et conseils pour apprendre une nouvelle langue, pour tous les niveaux.
 
 ## Techno utilisées :
 - VueJS
@@ -43,4 +44,4 @@ Database : MongoDB Compass > localhost:27017/EFREI_Projet
 - Express
 - MongoDB
 
-TEST
+TEST123
