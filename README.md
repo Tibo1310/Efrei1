@@ -4,15 +4,19 @@
 ```
 npm install
 ```
+### Compiles and minifies for production
+```
+npm run build
+```
 
-### Compiles and hot-reloads for development
+### FRONTEND (bien se mettre sur le dossier frontend)
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### BACKEND (bien se mettre sur le dossier principal du projet)
 ```
-npm run build
+node server.js
 ```
 
 ### Lints and fixes files
