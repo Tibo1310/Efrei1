@@ -40,6 +40,13 @@ npm run serve
 node server.js
 ```
 
+### DOCKER (bien lancer Docker Desktop et ça fonctionne parfaitement)
+```
+docker-compose build
+docker-compose up
+```
+
+
 ### Lints and fixes files
 ```
 npm run lint
