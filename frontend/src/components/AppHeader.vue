@@ -7,6 +7,17 @@
         Spella
       </router-link>
 
+      <!-- User info for mobile -->
+      <div class="d-flex align-items-center d-lg-none me-2">
+        <div v-if="isLoggedIn" class="user-info-mobile">
+          <div class="user-icon" @click="showIconSelector = true">
+            <img v-if="userIcon && userIcon.startsWith('/uploads/')" :src="`http://localhost:5000${userIcon}`" class="custom-icon" alt="User icon" />
+            <i v-else :class="userIcon"></i>
+          </div>
+          <span class="text-light ms-2">{{ username }}</span>
+        </div>
+      </div>
+
       <!-- Bouton de bascule pour les petits écrans -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -203,6 +214,37 @@ export default {
   
   .nav-item {
     margin-bottom: 10px;
+  }
+}
+
+.user-info-mobile {
+  display: flex;
+  align-items: center;
+}
+
+.user-info-mobile .user-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.user-info-mobile .custom-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info-mobile span {
+  font-size: 0.9rem;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+  .navbar-brand {
+    max-width: 50%;
   }
 }
 </style>
